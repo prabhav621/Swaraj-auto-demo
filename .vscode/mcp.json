@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "c:/Users/Lenovo/.gemini/antigravity/playground/Swaraj Autio"
+      ]
+    },
+    "jupyter": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-jupyter"
+      ],
+      "env": {
+        "JUPYTER_PORT": "8888"
+      }
+    }
+  }
+}
