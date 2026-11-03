@@ -30,7 +30,7 @@ let cachedData: MasterRecord[] | null = null;
 function getMasterData(): MasterRecord[] {
     if (cachedData) return cachedData;
     try {
-        const csvPath = path.join(process.cwd(), '..', 'backend', 'government_master_data.csv');
+        const csvPath = path.join(process.cwd(), 'data', 'government_master_data.csv');
         const fileContent = fs.readFileSync(csvPath, 'utf-8');
         const lines = fileContent.trim().split('\n');
         const headers = lines[0].split(',');

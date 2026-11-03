@@ -1,0 +1,101 @@
+id,name,father_name,tehsil,income,land_holding_ha,category,expected_status
+1,Ram Meena,Shyam Jat,Phagi,309877,0.88,Ineligible,STATUS_REJECTED
+2,Om Devi,Geeta Jat,Bassi,160915,0.67,Eligible,STATUS_AUTO_APPROVE
+3,Govind Meena,Govind Yadav,Jamwa Ramgarh,107263,0.38,Eligible,STATUS_AUTO_APPROVE
+4,Anita,Suresh Singh,Bassi,88051,0.88,Fuzzy,STATUS_FIELD_VERIFICATION
+5,Sunita Jat,Om Kumar,Bassi,181598,1.47,Eligible,STATUS_AUTO_APPROVE
+6,Anita Devi,Sunita Devi,Jamwa Ramgarh,70142,1.76,Eligible,STATUS_AUTO_APPROVE
+7,Suresh,Anita Jat,Jamwa Ramgarh,115051,0.31,Fuzzy,STATUS_FIELD_VERIFICATION
+8,Govind Sharma,Suresh Devi,Bassi,73324,1.11,Eligible,STATUS_AUTO_APPROVE
+9,Shyam,Sunita Jat,Phagi,125067,1.82,Fuzzy,STATUS_FIELD_VERIFICATION
+10,Anita Singh,Ram Devi,Jamwa Ramgarh,291145,1.07,Ineligible,STATUS_REJECTED
+11,Ram,Govind Kumar,Jamwa Ramgarh,132322,0.39,Fuzzy,STATUS_FIELD_VERIFICATION
+12,Govind Yadav,Shyam Sharma,Bassi,170553,1.81,Eligible,STATUS_AUTO_APPROVE
+13,Anita,Sita Yadav,Jamwa Ramgarh,96256,1.49,Fuzzy,STATUS_FIELD_VERIFICATION
+14,Anita Meena,Ramesh Meena,Phagi,126497,0.35,Eligible,STATUS_AUTO_APPROVE
+15,Geeta,Sunita Kumar,Phagi,132670,1.17,Fuzzy,STATUS_FIELD_VERIFICATION
+16,Geeta Yadav,Ram Singh,Jamwa Ramgarh,368298,1.08,Ineligible,STATUS_REJECTED
+17,Anita Meena,Suresh Singh,Bassi,167010,1.73,Eligible,STATUS_AUTO_APPROVE
+18,Om Devi,Ram Devi,Jamwa Ramgarh,112996,0.31,Eligible,STATUS_AUTO_APPROVE
+19,Om Devi,Ramesh Jat,Jamwa Ramgarh,180940,4.61,Ineligible,STATUS_REJECTED
+20,Anita Kumar,Geeta Jat,Jamwa Ramgarh,72301,0.99,Eligible,STATUS_AUTO_APPROVE
+21,Om Sharma,Govind Singh,Phagi,169125,0.63,Eligible,STATUS_AUTO_APPROVE
+22,Anita Kumar,Sita Meena,Jamwa Ramgarh,116515,0.24,Eligible,STATUS_AUTO_APPROVE
+23,Ram Singh,Ram Devi,Phagi,52364,3.9,Ineligible,STATUS_REJECTED
+24,Sita,Govind Singh,Jamwa Ramgarh,173786,0.18,Fuzzy,STATUS_FIELD_VERIFICATION
+25,Om,Suresh Kumar,Phagi,124283,0.79,Fuzzy,STATUS_FIELD_VERIFICATION
+26,Shyam Yadav,Sita Sharma,Phagi,120339,1.65,Eligible,STATUS_AUTO_APPROVE
+27,Sita,Suresh Singh,Bassi,189770,0.22,Fuzzy,STATUS_FIELD_VERIFICATION
+28,Om,Govind Singh,Jamwa Ramgarh,171853,0.28,Fuzzy,STATUS_FIELD_VERIFICATION
+29,Om,Ram Meena,Bassi,127773,1.52,Fuzzy,STATUS_FIELD_VERIFICATION
+30,Shyam Sharma,Om Sharma,Jamwa Ramgarh,125460,0.4,Eligible,STATUS_AUTO_APPROVE
+31,Sita,Shyam Devi,Phagi,90624,1.08,Fuzzy,STATUS_FIELD_VERIFICATION
+32,Anita Sharma,Anita Jat,Phagi,76502,0.83,Eligible,STATUS_AUTO_APPROVE
+33,Govind,Shyam Singh,Bassi,173076,0.28,Fuzzy,STATUS_FIELD_VERIFICATION
+34,Anita,Ram Sharma,Phagi,177801,0.14,Fuzzy,STATUS_FIELD_VERIFICATION
+35,Om Devi,Om Yadav,Bassi,140034,0.22,Eligible,STATUS_AUTO_APPROVE
+36,Govind Devi,Sunita Singh,Phagi,155260,0.92,Eligible,STATUS_AUTO_APPROVE
+37,Om,Sita Yadav,Jamwa Ramgarh,130914,0.33,Fuzzy,STATUS_FIELD_VERIFICATION
+38,Ram,Om Yadav,Jamwa Ramgarh,69371,1.02,Fuzzy,STATUS_FIELD_VERIFICATION
+39,Suresh Kumar,Govind Sharma,Bassi,188871,1.7,Eligible,STATUS_AUTO_APPROVE
+40,Geeta Sharma,Shyam Sharma,Jamwa Ramgarh,120063,1.22,Eligible,STATUS_AUTO_APPROVE
+41,Sita Kumar,Sunita Jat,Jamwa Ramgarh,175245,0.58,Eligible,STATUS_AUTO_APPROVE
+42,Sita Kumar,Anita Yadav,Bassi,128170,0.21,Eligible,STATUS_AUTO_APPROVE
+43,Ramesh Devi,Sita Sharma,Jamwa Ramgarh,157448,0.25,Eligible,STATUS_AUTO_APPROVE
+44,Anita,Ramesh Singh,Phagi,188529,1.4,Fuzzy,STATUS_FIELD_VERIFICATION
+45,Sita Meena,Geeta Devi,Jamwa Ramgarh,383398,1.6,Ineligible,STATUS_REJECTED
+46,Anita Meena,Sita Sharma,Phagi,181962,0.49,Eligible,STATUS_AUTO_APPROVE
+47,Suresh Yadav,Sunita Singh,Bassi,126509,0.16,Eligible,STATUS_AUTO_APPROVE
+48,Ram Jat,Om Meena,Phagi,151693,0.32,Eligible,STATUS_AUTO_APPROVE
+49,Govind Devi,Sita Devi,Phagi,158412,1.75,Eligible,STATUS_AUTO_APPROVE
+50,Govind,Shyam Kumar,Bassi,136279,0.25,Fuzzy,STATUS_FIELD_VERIFICATION
+51,Govind Singh,Govind Devi,Bassi,100921,1.9,Eligible,STATUS_AUTO_APPROVE
+52,Shyam,Om Jat,Phagi,95483,1.84,Fuzzy,STATUS_FIELD_VERIFICATION
+53,Sita Devi,Ram Devi,Phagi,158214,0.35,Eligible,STATUS_AUTO_APPROVE
+54,Shyam Sharma,Sunita Meena,Jamwa Ramgarh,57850,1.57,Eligible,STATUS_AUTO_APPROVE
+55,Shyam Jat,Shyam Yadav,Phagi,181019,1.85,Eligible,STATUS_AUTO_APPROVE
+56,Sita Jat,Suresh Sharma,Jamwa Ramgarh,183598,1.52,Eligible,STATUS_AUTO_APPROVE
+57,Sunita Meena,Sita Sharma,Bassi,154600,1.35,Eligible,STATUS_AUTO_APPROVE
+58,Shyam,Ramesh Kumar,Phagi,149172,0.86,Fuzzy,STATUS_FIELD_VERIFICATION
+59,Ram Yadav,Shyam Devi,Bassi,186164,0.47,Eligible,STATUS_AUTO_APPROVE
+60,Ramesh Singh,Ram Meena,Bassi,154076,0.43,Eligible,STATUS_AUTO_APPROVE
+61,Anita Singh,Om Singh,Phagi,77158,1.76,Eligible,STATUS_AUTO_APPROVE
+62,Shyam Jat,Anita Meena,Jamwa Ramgarh,62030,2.29,Ineligible,STATUS_REJECTED
+63,Om Kumar,Sita Yadav,Phagi,90648,0.9,Eligible,STATUS_AUTO_APPROVE
+64,Shyam Sharma,Suresh Devi,Phagi,120230,9.11,Ineligible,STATUS_REJECTED
+65,Govind,Geeta Singh,Jamwa Ramgarh,79359,0.81,Fuzzy,STATUS_FIELD_VERIFICATION
+66,Ram,Ramesh Devi,Bassi,89435,1.4,Fuzzy,STATUS_FIELD_VERIFICATION
+67,Sunita Yadav,Shyam Yadav,Phagi,171440,1.01,Eligible,STATUS_AUTO_APPROVE
+68,Geeta Jat,Anita Jat,Bassi,223462,1.34,Ineligible,STATUS_REJECTED
+69,Suresh Devi,Sunita Kumar,Jamwa Ramgarh,280119,0.31,Ineligible,STATUS_REJECTED
+70,Suresh Kumar,Ramesh Sharma,Bassi,95204,1.33,Eligible,STATUS_AUTO_APPROVE
+71,Sunita Meena,Sunita Jat,Bassi,144212,1.06,Eligible,STATUS_AUTO_APPROVE
+72,Ramesh Singh,Shyam Yadav,Bassi,442914,0.75,Ineligible,STATUS_REJECTED
+73,Anita Singh,Om Devi,Phagi,186928,1.86,Eligible,STATUS_AUTO_APPROVE
+74,Suresh,Suresh Devi,Jamwa Ramgarh,91208,1.7,Fuzzy,STATUS_FIELD_VERIFICATION
+75,Om Meena,Sita Singh,Jamwa Ramgarh,158087,1.5,Eligible,STATUS_AUTO_APPROVE
+76,Om Sharma,Sunita Jat,Jamwa Ramgarh,71418,0.7,Eligible,STATUS_AUTO_APPROVE
+77,Sunita Singh,Ramesh Singh,Jamwa Ramgarh,134799,0.48,Eligible,STATUS_AUTO_APPROVE
+78,Ramesh Sharma,Geeta Meena,Jamwa Ramgarh,122994,1.21,Eligible,STATUS_AUTO_APPROVE
+79,Suresh Jat,Ram Singh,Phagi,184277,0.96,Eligible,STATUS_AUTO_APPROVE
+80,Om Kumar,Ram Yadav,Bassi,185869,0.65,Eligible,STATUS_AUTO_APPROVE
+81,Sunita Sharma,Ram Yadav,Phagi,106194,0.67,Eligible,STATUS_AUTO_APPROVE
+82,Suresh Jat,Om Meena,Phagi,75595,0.44,Eligible,STATUS_AUTO_APPROVE
+83,Sunita Kumar,Sita Meena,Bassi,147154,8.66,Ineligible,STATUS_REJECTED
+84,Ram,Sunita Sharma,Phagi,162280,1.78,Fuzzy,STATUS_FIELD_VERIFICATION
+85,Ramesh Meena,Geeta Devi,Phagi,368610,1.74,Ineligible,STATUS_REJECTED
+86,Govind Kumar,Ramesh Meena,Phagi,176594,1.55,Eligible,STATUS_AUTO_APPROVE
+87,Shyam,Ram Meena,Phagi,119216,0.2,Fuzzy,STATUS_FIELD_VERIFICATION
+88,Om Jat,Govind Sharma,Phagi,71981,0.69,Eligible,STATUS_AUTO_APPROVE
+89,Om Singh,Om Singh,Bassi,384110,0.92,Ineligible,STATUS_REJECTED
+90,Govind Sharma,Govind Yadav,Bassi,139281,0.72,Eligible,STATUS_AUTO_APPROVE
+91,Ram Singh,Sunita Devi,Jamwa Ramgarh,418758,1.81,Ineligible,STATUS_REJECTED
+92,Geeta Sharma,Ram Sharma,Jamwa Ramgarh,96368,0.77,Eligible,STATUS_AUTO_APPROVE
+93,Shyam Meena,Geeta Sharma,Bassi,122937,1.32,Eligible,STATUS_AUTO_APPROVE
+94,Sunita Meena,Shyam Kumar,Bassi,189708,9.83,Ineligible,STATUS_REJECTED
+95,Sita Devi,Sita Meena,Jamwa Ramgarh,141914,0.64,Eligible,STATUS_AUTO_APPROVE
+96,Om,Om Kumar,Bassi,94845,1.46,Fuzzy,STATUS_FIELD_VERIFICATION
+97,Geeta Jat,Anita Devi,Phagi,104648,1.78,Eligible,STATUS_AUTO_APPROVE
+98,Sita Kumar,Sita Kumar,Phagi,54824,0.25,Eligible,STATUS_AUTO_APPROVE
+99,Ramesh,Om Meena,Phagi,174183,1.63,Fuzzy,STATUS_FIELD_VERIFICATION
+100,Shyam Devi,Suresh Meena,Phagi,132992,0.86,Eligible,STATUS_AUTO_APPROVE
