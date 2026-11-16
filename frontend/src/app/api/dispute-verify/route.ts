@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   runMultiFamilyGraphCheck,
   runVahanFootprintCheck,
+  runMemberSplitGraphCheck,
   evaluateDeltaWatcherPredicate,
 } from "@/lib/dispute-engine";
 
@@ -11,11 +12,12 @@ export async function POST(request: Request) {
     const { action } = body;
 
     if (action === "graph-check") {
-      const { primaryJanAadhaar, coResidingJanAadhaars, simulateCollision } = body;
+      const { primaryJanAadhaar, coResidingJanAadhaars, simulateCollision, customThreshold } = body;
       const result = runMultiFamilyGraphCheck(
         primaryJanAadhaar || "4829103847",
         coResidingJanAadhaars || ["4829103848", "4829103849"],
-        Boolean(simulateCollision)
+        Boolean(simulateCollision),
+        Number(customThreshold ?? 24000)
       );
       return NextResponse.json(result);
     }
@@ -26,12 +28,19 @@ export async function POST(request: Request) {
       return NextResponse.json(result);
     }
 
+    if (action === "member-split-check") {
+      const { simulateFraud } = body;
+      const result = runMemberSplitGraphCheck(Boolean(simulateFraud));
+      return NextResponse.json(result);
+    }
+
     if (action === "delta-watcher") {
-      const { nextMonthBill, linkedFamiliesCount, isMeterSegregated } = body;
+      const { nextMonthBill, linkedFamiliesCount, isMeterSegregated, customThreshold } = body;
       const result = evaluateDeltaWatcherPredicate(
         Number(nextMonthBill ?? 28500),
         Number(linkedFamiliesCount ?? 3),
-        Boolean(isMeterSegregated)
+        Boolean(isMeterSegregated),
+        Number(customThreshold ?? 24000)
       );
       return NextResponse.json(result);
     }
