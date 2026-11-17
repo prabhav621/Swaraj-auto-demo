@@ -9,6 +9,7 @@ import {
   MultiFamilyGraphResult,
   VahanFootprintResult,
   MemberSplitGraphResult,
+  AlternativeRebuttalResult,
   DeltaWatcherEvaluation,
 } from "@/lib/dispute-engine";
 import {
@@ -65,6 +66,7 @@ export default function SmartDisputePoc() {
   const [graphResult, setGraphResult] = useState<MultiFamilyGraphResult | null>(null);
   const [vahanResult, setVahanResult] = useState<VahanFootprintResult | null>(null);
   const [memberSplitResult, setMemberSplitResult] = useState<MemberSplitGraphResult | null>(null);
+  const [altRebuttalResult, setAltRebuttalResult] = useState<AlternativeRebuttalResult | null>(null);
 
   // Tab 3 (Adjudication) state
   const [adjudicationDecision, setAdjudicationDecision] = useState<
@@ -78,7 +80,6 @@ export default function SmartDisputePoc() {
   const [isMeterSegregated, setIsMeterSegregated] = useState(false);
   const [deltaResult, setDeltaResult] = useState<DeltaWatcherEvaluation | null>(null);
 
-  // Sync Step 0 Preset selection
   const handleSelectPreset = (presetKey: string) => {
     setSelectedPresetKey(presetKey);
     const p = SCHEME_PLAYBOOK_PRESETS[presetKey];
@@ -89,13 +90,13 @@ export default function SmartDisputePoc() {
     }
   };
 
-  // Reset states when switching cases
   useEffect(() => {
     const c = SEEDED_CASES[selectedCaseKey];
     setSelectedRebuttalId(c.allowedRebuttals[0]?.id || "");
     setGraphResult(null);
     setVahanResult(null);
     setMemberSplitResult(null);
+    setAltRebuttalResult(null);
     setAdjudicationDecision(null);
     setIsPlayingIvr(false);
     setTier2ConfirmChecked(false);
@@ -107,7 +108,6 @@ export default function SmartDisputePoc() {
     }
   }, [selectedCaseKey]);
 
-  // Trigger delta-watcher evaluation automatically when inputs or Step 0 threshold change
   useEffect(() => {
     async function runDelta() {
       try {
@@ -133,10 +133,39 @@ export default function SmartDisputePoc() {
     runDelta();
   }, [nextMonthBill, linkedFamilies, isMeterSegregated, customDiscomThreshold]);
 
-  // Execute Forensic Proof check
+  const activeRebuttalObj = currentCase.allowedRebuttals.find((r) => r.id === selectedRebuttalId);
+
+  // Audit Fix #20: Route T1/T5/T6 rebuttals explicitly to their verification handler
   const handleRunForensicProof = async () => {
     setIsVerifyingProof(true);
+    setGraphResult(null);
+    setVahanResult(null);
+    setMemberSplitResult(null);
+    setAltRebuttalResult(null);
+
     try {
+      const opCode = activeRebuttalObj?.operatorCode || "T4";
+      const isPrimaryCasePath =
+        (currentCase.ruleCode === "RULE_DISCOM_24K" && opCode === "T4") ||
+        (currentCase.ruleCode === "RULE_VAHAN_4W" && opCode === "T2") ||
+        (currentCase.ruleCode === "RULE_GOVT_EMP_K01" && selectedRebuttalId === "EMPLOYED_SON_MEMBER_SPLIT");
+
+      if (!isPrimaryCasePath) {
+        const res = await fetch("/api/dispute-verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "alternative-rebuttal-check",
+            operatorCode: opCode,
+            rebuttalId: selectedRebuttalId,
+            documentReference: tier2DocReference,
+          }),
+        });
+        const data: AlternativeRebuttalResult = await res.json();
+        setAltRebuttalResult(data);
+        return;
+      }
+
       if (currentCase.ruleCode === "RULE_DISCOM_24K") {
         const res = await fetch("/api/dispute-verify", {
           method: "POST",
@@ -186,10 +215,8 @@ export default function SmartDisputePoc() {
     setTimeout(() => {
       setAdjudicationDecision(decision);
       setIsSigningOrder(false);
-    }, 500);
+    }, 400);
   };
-
-  const activeRebuttalObj = currentCase.allowedRebuttals.find((r) => r.id === selectedRebuttalId);
 
   return (
     <div className="space-y-6">
@@ -202,11 +229,11 @@ export default function SmartDisputePoc() {
                 Multi-Scheme Jan Aadhaar 2.0 Engine
               </span>
               <span className="text-xs text-slate-400 font-mono">
-                Step 0 Playbook Compiler → L1 Matrix → L2 Cure Window → L3 e-Mitra (T1–T6) → L4 Speaking Order & Delta Shield
+                Step 0 Playbook Compiler &rarr; L1 Matrix &rarr; L2 Cure Window &rarr; L3 e-Mitra (T1–T6) &rarr; L4 Speaking Order &amp; Delta Shield
               </span>
             </div>
             <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-              Swaraj-Auto (स्वराज-ऑटो): Multi-Scheme Scrutiny & Due-Process Engine
+              Swaraj-Auto (स्वराज-ऑटो): Multi-Scheme Scrutiny &amp; Due-Process Engine
             </h2>
             <p className="text-sm text-slate-300 mt-1 max-w-3xl leading-relaxed">
               Parameterizes Rajasthan welfare schemes in 60 seconds and resolves household-graph disputes (joint-family meters, un-split employed children, and un-transferred vehicle RCs) using Jan Aadhaar 2.0&apos;s native family graph.
@@ -254,7 +281,7 @@ export default function SmartDisputePoc() {
         {/* Selected Case Quick Stats Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-slate-800 text-xs">
           <div>
-            <span className="text-slate-400 block">Case Docket & Endpoint:</span>
+            <span className="text-slate-400 block">Case Docket &amp; Endpoint:</span>
             <span className="font-mono font-bold text-white text-sm">{currentCase.caseId}</span>
             <span className="font-mono text-[10px] text-emerald-400 block truncate">{currentCase.sourceEndpointUri}</span>
           </div>
@@ -265,7 +292,7 @@ export default function SmartDisputePoc() {
             </span>
           </div>
           <div>
-            <span className="text-slate-400 block">Tehsil & LGD Ward:</span>
+            <span className="text-slate-400 block">Tehsil &amp; LGD Ward:</span>
             <span className="font-bold text-slate-200">
               {currentCase.tehsil}, {currentCase.district} (LGD #{currentCase.lgdWardCode})
             </span>
@@ -280,7 +307,7 @@ export default function SmartDisputePoc() {
         </div>
       </div>
 
-      {/* 5-Stage Navigation Tabs (Step 0 Frontrunner + Layers 1-4) */}
+      {/* 5-Stage Navigation Tabs */}
       <div className="flex border-b border-slate-200 bg-white rounded-t-xl px-4 pt-3 gap-2 overflow-x-auto shadow-sm">
         <button
           onClick={() => setActiveTab("step0")}
@@ -293,7 +320,7 @@ export default function SmartDisputePoc() {
           <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-xs font-black">
             STEP 0
           </span>
-          Scheme Onboarding & Playbook Builder
+          Scheme Onboarding &amp; Playbook Builder
         </button>
 
         <button
@@ -307,7 +334,7 @@ export default function SmartDisputePoc() {
           <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black">
             1
           </span>
-          SMART Intake & Cure Notice
+          SMART Intake &amp; Cure Notice
         </button>
 
         <button
@@ -356,7 +383,7 @@ export default function SmartDisputePoc() {
       {/* TAB CONTENT PANELS */}
       <div className="bg-white rounded-b-xl rounded-tr-xl p-6 shadow-md border border-slate-100 min-h-[540px]">
         {/* ========================================================================= */}
-        {/* TAB 0: STEP 0 SCHEME ONBOARDING & PLAYBOOK BUILDER (NO-CODE POLICY COMPILER) */}
+        {/* TAB 0: STEP 0 SCHEME ONBOARDING & PLAYBOOK BUILDER */}
         {/* ========================================================================= */}
         {activeTab === "step0" && (
           <div className="space-y-6 animate-in fade-in duration-300">
@@ -393,12 +420,11 @@ export default function SmartDisputePoc() {
               </div>
             </div>
 
-            {/* 3-Column Policy Compiler */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              {/* Column 1: Scheme Metadata & Statutory Exemptions */}
+              {/* Column 1 */}
               <div className="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4 text-xs">
                 <div className="font-black text-slate-800 text-sm border-b pb-2 flex items-center justify-between">
-                  <span>1. Government Order & Exemptions</span>
+                  <span>1. Government Order &amp; Exemptions</span>
                   <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">
                     U1 + U10 Shield
                   </span>
@@ -432,9 +458,24 @@ export default function SmartDisputePoc() {
                     ))}
                   </div>
                 </div>
+                <div>
+                  <span className="text-slate-500 font-semibold block mb-1.5">
+                    Active K &amp; A Rule Toggles:
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {[...activePreset.activeKRules, ...activePreset.activeARules].map((rule) => (
+                      <span
+                        key={rule}
+                        className="px-2 py-0.5 bg-slate-200 text-slate-800 rounded font-mono text-[10px] font-semibold"
+                      >
+                        {rule}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* Column 2: Live Parameterized Thresholds ($Placeholders) + Materiality Gate */}
+              {/* Column 2 */}
               <div className="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4 text-xs">
                 <div className="font-black text-slate-800 text-sm border-b pb-2 flex items-center justify-between">
                   <span>2. Parameterized Thresholds ($X)</span>
@@ -477,7 +518,7 @@ export default function SmartDisputePoc() {
                       className="w-full accent-amber-500 cursor-pointer"
                     />
                     <span className="text-[10px] text-slate-500 block">
-                      Updates Case 1 & Tab 4 Delta-Watcher threshold in real time
+                      Updates Case 1 &amp; Tab 4 Delta-Watcher threshold in real time
                     </span>
                   </div>
 
@@ -520,7 +561,7 @@ export default function SmartDisputePoc() {
                 </div>
               </div>
 
-              {/* Column 3: Bound T1-T6 Universal Rebuttal Operators & Layer-1 Auto-Shields */}
+              {/* Column 3 */}
               <div className="lg:col-span-4 bg-slate-900 text-white rounded-2xl p-4 space-y-3 text-xs">
                 <div className="font-black text-sm border-b border-slate-800 pb-2 flex items-center justify-between">
                   <span className="text-emerald-400">3. Universal Rebuttal Matrix (T1–T6)</span>
@@ -565,7 +606,7 @@ export default function SmartDisputePoc() {
               </div>
             </div>
 
-            {/* 12-Endpoint State (RajSewaDwaar) & Central (DFPD / API Setu) Connector Grid */}
+            {/* 12-Endpoint Connector Grid */}
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-2">
                 <h4 className="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
@@ -869,12 +910,12 @@ export default function SmartDisputePoc() {
                 {currentCase.ruleCode === "RULE_VAHAN_4W" && (
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
                     <span className="font-bold text-slate-800 block">
-                      Vahan 4.0 RC Telemetry & Form 29/30 Verification:
+                      Vahan 4.0 RC Telemetry &amp; Form 29/30 Verification:
                     </span>
                     <div className="p-2.5 bg-white rounded border space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Form 29/30 & Delivery Note:</span>
-                        <span className="font-bold text-slate-800">Scanned & Verified (14-May-2019)</span>
+                        <span className="text-slate-500">Form 29/30 &amp; Delivery Note:</span>
+                        <span className="font-bold text-slate-800">Scanned &amp; Verified (14-May-2019)</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500">Vehicle:</span>
@@ -903,7 +944,7 @@ export default function SmartDisputePoc() {
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
                     <span className="font-bold text-slate-800 flex items-center gap-1.5">
                       <Users className="w-4 h-4 text-emerald-600" />
-                      Jan Aadhaar 2.0 Member Table & DFPD e-POS Grain Telemetry:
+                      Jan Aadhaar 2.0 Member Table &amp; DFPD e-POS Grain Telemetry:
                     </span>
                     <div className="p-2.5 bg-white rounded border space-y-1.5 font-mono text-[11px]">
                       <div className="flex justify-between">
@@ -963,7 +1004,7 @@ export default function SmartDisputePoc() {
                     <div className="flex items-center gap-2">
                       <Shield className="w-4 h-4 text-emerald-400" />
                       <h4 className="font-black text-sm text-white">
-                        Deterministic Jan Aadhaar 2.0 Graph & Registry Attestation
+                        Deterministic Jan Aadhaar 2.0 Graph &amp; Registry Attestation
                       </h4>
                     </div>
                     <span className="text-[10px] font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded">
@@ -971,7 +1012,7 @@ export default function SmartDisputePoc() {
                     </span>
                   </div>
 
-                  {!graphResult && !vahanResult && !memberSplitResult && !isVerifyingProof && (
+                  {!graphResult && !vahanResult && !memberSplitResult && !altRebuttalResult && !isVerifyingProof && (
                     <div className="py-20 text-center text-slate-400 text-sm">
                       <Scale className="w-10 h-10 mx-auto text-slate-600 mb-3 opacity-60" />
                       Click <b>&quot;Run Swaraj-Auto Cross-Registry Proof Engine&quot;</b> to execute deterministic verification across Jan Aadhaar 2.0 and connected registries.
@@ -982,6 +1023,40 @@ export default function SmartDisputePoc() {
                     <div className="py-20 text-center text-slate-300 space-y-3">
                       <RefreshCw className="w-8 h-8 mx-auto text-emerald-400 animate-spin" />
                       <p className="text-sm font-mono">Querying {currentCase.sourceEndpointUri} + Jan Aadhaar 2.0 Family Graph...</p>
+                    </div>
+                  )}
+
+                  {/* Audit Fix #20: Alternative T1/T5/T6 Rebuttal Verification Output */}
+                  {altRebuttalResult && !isVerifyingProof && (
+                    <div className="space-y-4 animate-in fade-in">
+                      <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-800/80 border border-slate-700">
+                        <div>
+                          <span className="text-xs text-slate-400 block">Operator Execution Status:</span>
+                          <span className="font-black text-base flex items-center gap-1.5 text-emerald-400">
+                            <CheckCircle2 className="w-4 h-4" />
+                            {altRebuttalResult.statusCode}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs text-slate-400 block">Operator Code:</span>
+                          <span className="font-mono font-bold text-amber-400 text-base">
+                            {altRebuttalResult.operatorCode} ({altRebuttalResult.recommendedBdoAction})
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+                        <p className="text-slate-200 leading-relaxed font-sans">
+                          {altRebuttalResult.explanationHindi}
+                        </p>
+                        <p className="text-slate-400 text-[11px] leading-relaxed">
+                          {altRebuttalResult.explanationEnglish}
+                        </p>
+                        <div className="pt-2 border-t border-slate-800 flex justify-between font-mono text-[11px]">
+                          <span className="text-slate-500">Logged Evidence Ref:</span>
+                          <span className="text-emerald-400">{altRebuttalResult.documentReference}</span>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -1007,7 +1082,7 @@ export default function SmartDisputePoc() {
                         <div className="text-right">
                           <span className="text-xs text-slate-400 block">Jan Aadhaar 2.0 Lineage:</span>
                           <span className="font-mono font-bold text-amber-400 text-base">
-                            Verified Split-Family Graph
+                            100% Deterministic Match
                           </span>
                         </div>
                       </div>
@@ -1206,19 +1281,19 @@ export default function SmartDisputePoc() {
                 </span>
                 <div className="space-y-1.5">
                   <div className="flex justify-between">
-                    <span className="text-emerald-700">Rebuttal Operator:</span>
+                    <span className="text-emerald-700">Selected Operator:</span>
                     <span className="font-bold text-emerald-950">
-                      {currentCase.ruleCode === "RULE_DISCOM_24K"
-                        ? "T4 Denominator Split (3 Jan Aadhaar 2.0 Families)"
-                        : currentCase.ruleCode === "RULE_VAHAN_4W"
-                        ? "T2 Temporal Cutoff (Form 29/30 + Expired 15Yr RC)"
-                        : "T3 Member Split (Remove Employed Son Unit; Keep Parents)"}
+                      {activeRebuttalObj
+                        ? `[${activeRebuttalObj.operatorCode}] ${activeRebuttalObj.labelEnglish}`
+                        : "T4 Denominator Split"}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-emerald-700">Registry Attestation:</span>
                     <span className="font-bold text-emerald-900">
-                      {currentCase.ruleCode === "RULE_DISCOM_24K"
+                      {altRebuttalResult
+                        ? `${altRebuttalResult.statusCode} (${altRebuttalResult.documentReference})`
+                        : currentCase.ruleCode === "RULE_DISCOM_24K"
                         ? "Parent Jan Aadhaar Lineage Verified | 0 Collisions"
                         : currentCase.ruleCode === "RULE_VAHAN_4W"
                         ? "98.4% Dispossession Confidence | Vahan ELV Expired"
@@ -1228,7 +1303,9 @@ export default function SmartDisputePoc() {
                   <div className="flex justify-between">
                     <span className="text-emerald-700">Effective Assessment:</span>
                     <span className="font-bold text-emerald-950">
-                      {currentCase.ruleCode === "RULE_DISCOM_24K"
+                      {altRebuttalResult?.operatorCode === "T6"
+                        ? "Tier-2 Escalation -> Field Panchnama Recommended"
+                        : currentCase.ruleCode === "RULE_DISCOM_24K"
                         ? `₹9,500 / family (< ₹${customDiscomThreshold.toLocaleString("en-IN")} PASS)`
                         : currentCase.ruleCode === "RULE_VAHAN_4W"
                         ? "Dispossessed in 2019 (Eligible)"
@@ -1254,7 +1331,7 @@ export default function SmartDisputePoc() {
                   }`}
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  Approve Rebuttal & Issue Predicate Shield
+                  Approve Rebuttal &amp; Issue Predicate Shield
                 </button>
 
                 <button
@@ -1326,7 +1403,7 @@ export default function SmartDisputePoc() {
                     )}
                     {adjudicationDecision === "FIELD_VISIT" && (
                       <>
-                        प्रस्तुत साक्ष्यों की स्थलीय पुष्टि हेतु ग्राम विकास अधिकारी (VDO) / पटवारी {currentCase.tehsil} को निर्देशित किया जाता है कि 7 कार्यदिवस में भौतिक पंचनामा रिपोर्ट प्रस्तुत करें। माननीय सर्वोच्च न्यायालय के <i>S.Q. Masood (2022)</i> सिद्धांत के अनुसार तब तक लाभ सुरक्षित समीक्षा में रहेगा।
+                        प्रस्तुत साक्ष्यों ({tier2DocReference}) की स्थलीय पुष्टि हेतु ग्राम विकास अधिकारी (VDO) / पटवारी {currentCase.tehsil} को निर्देशित किया जाता है कि 7 कार्यदिवस में भौतिक पंचनामा रिपोर्ट प्रस्तुत करें। माननीय सर्वोच्च न्यायालय के <i>S.Q. Masood (2022)</i> सिद्धांत के अनुसार तब तक लाभ सुरक्षित समीक्षा में रहेगा।
                       </>
                     )}
                     {adjudicationDecision === "REJECTED" && (
@@ -1356,36 +1433,61 @@ export default function SmartDisputePoc() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 4: LIVE "DELTA-WATCHER" SIMULATOR */}
+        {/* TAB 4: LIVE "DELTA-WATCHER" SIMULATOR (COVERING ALL 3 CASES - AUDIT FIX #24) */}
         {/* ========================================================================= */}
         {activeTab === "delta" && (
           <div className="space-y-6 animate-in fade-in duration-300">
             <div className="bg-slate-950 text-white p-5 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <span className="text-xs uppercase tracking-wider font-bold text-amber-400 block mb-1">
-                  Stateful Exception Ledger (U6 Upgrade)
+                  Stateful Exception Ledger (U6 Upgrade — Active Across All 3 Cases)
                 </span>
                 <h3 className="text-xl font-black text-white">
                   Live &quot;Delta-Watcher&quot; Next-Month Batch Simulator
                 </h3>
                 <p className="text-xs text-slate-300 mt-1 max-w-2xl">
-                  Instead of a static boolean override that either fails next month or creates a permanent loophole, Swaraj-Auto writes a live mathematical predicate tied to the Step 0 threshold (<code>₹{customDiscomThreshold.toLocaleString("en-IN")}</code>).
+                  Instead of a static boolean override that fails next month or creates a permanent loophole, Swaraj-Auto writes a live mathematical predicate into the Exception Ledger for every resolved case.
                 </p>
               </div>
 
               <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs font-mono">
-                <span className="text-slate-400 block">// Active Predicate Rule:</span>
+                <span className="text-slate-400 block">// Active Case Predicate ({currentCase.caseId}):</span>
                 <span className="text-emerald-400 font-bold">
-                  (Bill / Families) &lt; ₹{customDiscomThreshold.toLocaleString("en-IN")}
+                  {currentCase.statefulPredicateSummary}
                 </span>
               </div>
+            </div>
+
+            {/* 3-Case Stateful Ledger Summary Strip (Audit Fix #24) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              {Object.entries(SEEDED_CASES).map(([key, c]) => (
+                <div
+                  key={key}
+                  onClick={() => setSelectedCaseKey(key)}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition ${
+                    selectedCaseKey === key
+                      ? "bg-emerald-50/70 border-emerald-400 shadow-sm"
+                      : "bg-slate-50 border-slate-200 hover:bg-slate-100"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-slate-900">{c.beneficiaryName}</span>
+                    <span className="font-mono text-[10px] bg-slate-900 text-white px-1.5 py-0.5 rounded">
+                      {c.ruleCode}
+                    </span>
+                  </div>
+                  <code className="text-[11px] text-emerald-800 block font-mono break-all">
+                    {c.statefulPredicateSummary}
+                  </code>
+                </div>
+              ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-6 bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-5">
                 <h4 className="font-bold text-slate-800 text-sm flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-primary" />
-                  Test Live Next-Month Registry Telemetry
+                  Test Live Next-Month Discom Telemetry (Case 1 Interactive Stress-Test)
                 </h4>
 
                 <div className="space-y-2">
@@ -1399,7 +1501,7 @@ export default function SmartDisputePoc() {
                     type="range"
                     min={12000}
                     max={90000}
-                    step={2500}
+                    step={1000}
                     value={nextMonthBill}
                     onChange={(e) => setNextMonthBill(Number(e.target.value))}
                     className="w-full accent-primary cursor-pointer"
@@ -1408,7 +1510,7 @@ export default function SmartDisputePoc() {
                     <span>₹12,000</span>
                     <span>₹{customDiscomThreshold.toLocaleString("en-IN")} (Cap)</span>
                     <span>₹48,000</span>
-                    <span>₹72,000</span>
+                    <span>₹72,000 (3x Cap)</span>
                     <span>₹90,000</span>
                   </div>
                 </div>

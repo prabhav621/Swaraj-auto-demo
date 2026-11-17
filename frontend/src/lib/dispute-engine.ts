@@ -1,5 +1,3 @@
-import stringSimilarity from "string-similarity";
-
 export type CaseStatus =
   | "FLAGGED_IN_CURE_WINDOW"
   | "EMITRA_REBUTTAL_SUBMITTED"
@@ -142,7 +140,7 @@ export const SCHEME_PLAYBOOK_PRESETS: Record<string, SchemePlaybookPreset> = {
     ruralSqftCap: 2000,
     palikaSqftCap: 1500,
     nigamSqftCap: 1000,
-    exemptCategories: ["Antyodaya", "BPL / State BPL", "Aastha Card", "Sahariya / Kathodi Tribe"],
+    exemptCategories: ["Antyodaya", "BPL / State BPL", "Aastha Card", "Sahariya / Kathodi / Khairwa Tribe"],
     activeKRules: ["K01_GOVT_EMP", "K02_INCOME_ITR", "K06_DUPLICATE", "K07_LIFECYCLE"],
     activeARules: ["A01_OCC_GAP (-25)", "A02_INCOME_GAP (-30)", "A03_DISCOM_BILL (-40)", "A04_UNSEEDED_KNO (-25)"],
     boundRebuttalOperators: [
@@ -169,7 +167,7 @@ export const SCHEME_PLAYBOOK_PRESETS: Record<string, SchemePlaybookPreset> = {
     nigamSqftCap: 1000,
     exemptCategories: ["Antyodaya Anna Yojana (AAY)", "Notified Kachhi Basti (K05 Exempt)", "1 Tractor / Livelihood Commercial Vehicle (K03 Exempt)"],
     activeKRules: ["K01_GOVT_EMP", "K02_INCOME_ITR", "K03_VEHICLE_4W", "K04_LAND_CAP", "K05_PUCCA_SQFT"],
-    activeARules: ["A01_OCC_GAP (-25)", "A02_INCOME_GAP (-30)", "A03_DISCOM_50K (-40)", "A05_MSP_100Q (-20)", "A06_PUMP_BARANI (-15)"],
+    activeARules: ["A01_OCC_GAP (-25)", "A02_INCOME_GAP (-30)", "A03_DISCOM_50K (-40)", "A05_MSP_100Q (-20)", "A06_PUMP_BARANI (-10)"],
     boundRebuttalOperators: [
       { code: "T1", name: "Sever Wrong ID Link", formula: "Link(M, A) = 0", description: "Wrong RC/PAN/K-No seeded or Bogus GST/MCA Cyber FIR" },
       { code: "T2", name: "Temporal Cutoff (Sold / Non-Drawal)", formula: "t_end(A) < t_now", description: "Vehicle sold on Form 29/30, RVSF scrapped, or 0 kg e-POS drawal" },
@@ -222,6 +220,7 @@ export interface ExclusionNoticeCase {
   thresholdValue: string;
   sourceDepartment: string;
   sourceEndpointUri: string;
+  statefulPredicateSummary: string;
   cureWindowDaysLeft: number;
   cureWindowExpiryDate: string;
   mobileNumberMasked: string;
@@ -257,6 +256,7 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
     thresholdValue: "₹24,000 / year",
     sourceDepartment: "Jaipur Vidyut Vitran Nigam Ltd (JVVNL - BijliMitra)",
     sourceEndpointUri: "rajsewadwaar://discom-bijlimitra/v2/consumer-ledger",
+    statefulPredicateSummary: "KNO_21049201122: (Annual_Bill / 3_Linked_Families) < $MAX_DISCOM_BILL",
     cureWindowDaysLeft: 12,
     cureWindowExpiryDate: "15-Nov-2026",
     mobileNumberMasked: "+91-9829X-XXXX1",
@@ -316,6 +316,7 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
     thresholdValue: "0 Four-Wheeler (1 Tractor / 1 Livelihood Commercial Vehicle Exempt)",
     sourceDepartment: "Transport Department (MoRTH Vahan 4.0 Registry)",
     sourceEndpointUri: "apisetu://morth-vahan/v4/rc-ownership-telemetry",
+    statefulPredicateSummary: "RC_RJ14CC4821: Dispossessed_2019 == True && Applicant_Renewal_Activity == False",
     cureWindowDaysLeft: 9,
     cureWindowExpiryDate: "12-Nov-2026",
     mobileNumberMasked: "+91-9414X-XXXX8",
@@ -375,6 +376,7 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
     thresholdValue: "No Regular Central/State/PSU Employee in Household",
     sourceDepartment: "DFPD Central Feed + Indian Railways HRMS (CRIS)",
     sourceEndpointUri: "apisetu://indian-railways-hrms/v1/employee-status",
+    statefulPredicateSummary: "JA_6738291044: Member_04_Split_Completed == True && Remaining_3_Members_Payroll == False",
     cureWindowDaysLeft: 14,
     cureWindowExpiryDate: "17-Nov-2026",
     mobileNumberMasked: "+91-9784X-XXXX2",
@@ -449,7 +451,7 @@ const JAN_AADHAAR_MOCK_REGISTRY: Record<
 
 export interface MultiFamilyGraphResult {
   verified: boolean;
-  statusCode: "GRAPH_VERIFIED_SUCCESS" | "COLLISION_DETECTED" | "ADDRESS_MISMATCH_FRAUD";
+  statusCode: "GRAPH_VERIFIED_SUCCESS" | "COLLISION_DETECTED" | "LINEAGE_MISMATCH_FRAUD";
   lineageSimilarityScore: number;
   totalAnnualBill: number;
   activeThreshold: number;
@@ -467,7 +469,9 @@ export interface MultiFamilyGraphResult {
 }
 
 /**
- * Moat Function 1: Jan Aadhaar 2.0 Native Split-Family Graph & Anti-Collision Resolution (T4)
+ * Moat Function 1: Deterministic Jan Aadhaar 2.0 Split-Family Graph & Anti-Collision Resolution (T4)
+ * Audit Fix #21: Zero fuzzy string-similarity; uses deterministic Parent-Family ID + LGD Ward equality,
+ * safe lookup on primaryJanAadhaar, supports N >= 2, and compares exact unrounded share.
  */
 export function runMultiFamilyGraphCheck(
   primaryJanAadhaar: string,
@@ -476,13 +480,33 @@ export function runMultiFamilyGraphCheck(
   customThreshold: number = 24000
 ): MultiFamilyGraphResult {
   const primary = JAN_AADHAAR_MOCK_REGISTRY[primaryJanAadhaar];
-  const allIds = [primaryJanAadhaar, ...coResidingJanAadhaars];
+  if (!primary) {
+    return {
+      verified: false,
+      statusCode: "LINEAGE_MISMATCH_FRAUD",
+      lineageSimilarityScore: 0,
+      totalAnnualBill: 28500,
+      activeThreshold: customThreshold,
+      verifiedFamilyCount: 1,
+      apportionedBillPerFamily: 28500,
+      isWithinThreshold: false,
+      advisoryDecision: "RECOMMEND_REJECT",
+      detailedProof: {
+        addressMatches: false,
+        fatherHusbandLineageMatch: "Primary Jan Aadhaar ID not found in LGD registry",
+        antiGamingCollisionPass: true,
+        verifiedMembers: [],
+      },
+    };
+  }
+
+  const allIds = Array.from(new Set([primaryJanAadhaar, ...coResidingJanAadhaars]));
 
   if (simulateCollision) {
     return {
       verified: false,
       statusCode: "COLLISION_DETECTED",
-      lineageSimilarityScore: 0.94,
+      lineageSimilarityScore: 1.0,
       totalAnnualBill: 28500,
       activeThreshold: customThreshold,
       verifiedFamilyCount: 3,
@@ -500,42 +524,41 @@ export function runMultiFamilyGraphCheck(
     };
   }
 
-  const verifiedMembers = [];
-  const lineageScores: number[] = [];
+  const verifiedMembers: Array<{ janAadhaarId: string; name: string; relation: string }> = [];
+  let deterministicMatches = 0;
 
   for (const id of allIds) {
     const record = JAN_AADHAAR_MOCK_REGISTRY[id];
-    if (record) {
+    if (
+      record &&
+      record.parentJanAadhaarId === primary.parentJanAadhaarId &&
+      record.ward === primary.ward
+    ) {
       verifiedMembers.push({ janAadhaarId: id, name: record.name, relation: record.relation });
-      const sim = stringSimilarity.compareTwoStrings(record.address, primary.address);
-      lineageScores.push(sim);
+      deterministicMatches += 1;
     }
   }
 
-  const avgLineage =
-    lineageScores.length > 0
-      ? lineageScores.reduce((a, b) => a + b, 0) / lineageScores.length
-      : 0;
-
   const totalBill = 28500;
-  const familyCount = verifiedMembers.length;
-  const apportionedBill = familyCount > 0 ? Math.round(totalBill / familyCount) : totalBill;
-  const isWithin = apportionedBill < customThreshold;
+  const familyCount = Math.max(1, verifiedMembers.length);
+  const exactShare = totalBill / familyCount;
+  const isWithin = exactShare < customThreshold;
+  const lineageRatio = allIds.length > 0 ? deterministicMatches / allIds.length : 0;
 
   return {
-    verified: familyCount >= 3 && avgLineage >= 0.85 && isWithin,
+    verified: familyCount >= 2 && lineageRatio === 1 && isWithin,
     statusCode: "GRAPH_VERIFIED_SUCCESS",
-    lineageSimilarityScore: parseFloat(avgLineage.toFixed(2)),
+    lineageSimilarityScore: parseFloat(lineageRatio.toFixed(2)),
     totalAnnualBill: totalBill,
     activeThreshold: customThreshold,
     verifiedFamilyCount: familyCount,
-    apportionedBillPerFamily: apportionedBill,
+    apportionedBillPerFamily: Math.round(exactShare),
     isWithinThreshold: isWithin,
     advisoryDecision: isWithin ? "RECOMMEND_RESTORE_WITH_PREDICATE" : "FLAG_FOR_FIELD_PANCHNAMA",
     detailedProof: {
-      addressMatches: true,
+      addressMatches: lineageRatio === 1,
       fatherHusbandLineageMatch:
-        "Parent Family ID JA-ROOT-1998-042110 & Shared Father/Husband (Late Ramesh Meena) verified in LGD 042110",
+        "Parent Family ID JA-ROOT-1998-042110 & Shared Father/Husband (Late Ramesh Meena) deterministically verified in LGD 042110",
       antiGamingCollisionPass: true,
       verifiedMembers,
     },
@@ -650,6 +673,47 @@ export function runMemberSplitGraphCheck(simulateActiveFraud: boolean = false): 
   };
 }
 
+export interface AlternativeRebuttalResult {
+  verified: boolean;
+  operatorCode: "T1" | "T2" | "T3" | "T4" | "T5" | "T6";
+  statusCode: "T1_T5_REGISTRY_OVERRIDE_VERIFIED" | "TIER2_ESCALATION_QUEUED_CURE_PROTECTED";
+  documentReference: string;
+  recommendedBdoAction: "APPROVED" | "FIELD_VISIT";
+  explanationHindi: string;
+  explanationEnglish: string;
+}
+
+/**
+ * Audit Fix #20: Explicit handler for T1, T5, and T6 (Natural Justice Tier-2 Escalation) options.
+ */
+export function runAlternativeRebuttalCheck(
+  operatorCode: "T1" | "T2" | "T3" | "T4" | "T5" | "T6",
+  rebuttalId: string,
+  documentReference: string = "DOC-RJ-2026-VERIFIED"
+): AlternativeRebuttalResult {
+  if (operatorCode === "T6") {
+    return {
+      verified: true,
+      operatorCode: "T6",
+      statusCode: "TIER2_ESCALATION_QUEUED_CURE_PROTECTED",
+      documentReference: documentReference || "FIR-2026-RJ-0891 / RAA-STAY-442",
+      recommendedBdoAction: "FIELD_VISIT",
+      explanationHindi: `प्राकृतिक न्याय एस्केलेशन (T6): मानक T1–T5 से भिन्न विशेष परिस्थिति दर्ज की गई। संलग्न आधिकारिक दस्तावेज़ (${documentReference}) को अपीलीय अधिकारी / पटवारी भौतिक पंचनामा समीक्षा हेतु अग्रेषित किया गया है। 15-दिवसीय सुरक्षा विंडो सक्रिय रहेगी।`,
+      explanationEnglish: `Natural Justice Escalation (T6): Exceptional circumstance outside T1–T5 logged with official document ref (${documentReference}). Routed to Appellate Officer / Field Panchnama queue while keeping the 15-day cure window protected.`,
+    };
+  }
+
+  return {
+    verified: true,
+    operatorCode,
+    statusCode: "T1_T5_REGISTRY_OVERRIDE_VERIFIED",
+    documentReference,
+    recommendedBdoAction: "APPROVED",
+    explanationHindi: `सत्यापित (${operatorCode} - ${rebuttalId}): विभागीय स्रोत रजिस्ट्री एवं प्रस्तुत साक्ष्य का मिलान सफल रहा। आवेदक की पात्रता बहाल रखने की अनुशंसा की जाती है।`,
+    explanationEnglish: `Verified (${operatorCode} - ${rebuttalId}): Source registry cross-check succeeded. Recommended for immediate benefit restoration.`,
+  };
+}
+
 export interface DeltaWatcherEvaluation {
   shieldStatus: "SHIELD_ACTIVE_PROTECTED" | "SHIELD_REVOKED_SPIKE" | "SHIELD_REVOKED_METERS_SPLIT";
   effectiveAnnualBill: number;
@@ -662,6 +726,7 @@ export interface DeltaWatcherEvaluation {
 
 /**
  * Moat Function 4: Stateful "Delta-Watcher" Predicate Evaluator
+ * Audit Fix #22: Compare exact unrounded `nextMonthBill / families < customThreshold` before rounding for display.
  */
 export function evaluateDeltaWatcherPredicate(
   nextMonthBill: number,
@@ -683,28 +748,30 @@ export function evaluateDeltaWatcherPredicate(
     };
   }
 
-  const effectiveShare = Math.round(nextMonthBill / Math.max(1, linkedFamiliesCount));
-  const isProtected = effectiveShare < customThreshold;
+  const divisor = Math.max(1, linkedFamiliesCount);
+  const exactShare = nextMonthBill / divisor;
+  const displayShare = Math.round(exactShare);
+  const isProtected = exactShare < customThreshold;
 
   if (isProtected) {
     return {
       shieldStatus: "SHIELD_ACTIVE_PROTECTED",
       effectiveAnnualBill: nextMonthBill,
-      effectivePerFamilyShare: effectiveShare,
+      effectivePerFamilyShare: displayShare,
       activeThreshold: customThreshold,
       isBenefitProtected: true,
-      reasonHindi: `संयुक्त मीटर बिल ₹${nextMonthBill.toLocaleString("en-IN")} को ${linkedFamiliesCount} सत्यापित परिवारों में विभाजित करने पर प्रति परिवार हिस्सा ₹${effectiveShare.toLocaleString("en-IN")} है (सीमा ₹${customThreshold.toLocaleString("en-IN")} से कम)। सुरक्षा शील्ड सक्रिय है।`,
-      reasonEnglish: `Joint meter bill ₹${nextMonthBill.toLocaleString("en-IN")} divided among ${linkedFamiliesCount} verified families gives ₹${effectiveShare.toLocaleString("en-IN")}/family (below ₹${customThreshold.toLocaleString("en-IN")} limit). Protection shield active.`,
+      reasonHindi: `संयुक्त मीटर बिल ₹${nextMonthBill.toLocaleString("en-IN")} को ${divisor} सत्यापित परिवारों में विभाजित करने पर प्रति परिवार हिस्सा ₹${displayShare.toLocaleString("en-IN")} है (सीमा ₹${customThreshold.toLocaleString("en-IN")} से कम)। सुरक्षा शील्ड सक्रिय है।`,
+      reasonEnglish: `Joint meter bill ₹${nextMonthBill.toLocaleString("en-IN")} divided among ${divisor} verified families gives ₹${displayShare.toLocaleString("en-IN")}/family (strictly below ₹${customThreshold.toLocaleString("en-IN")} limit). Protection shield active.`,
     };
   } else {
     return {
       shieldStatus: "SHIELD_REVOKED_SPIKE",
       effectiveAnnualBill: nextMonthBill,
-      effectivePerFamilyShare: effectiveShare,
+      effectivePerFamilyShare: displayShare,
       activeThreshold: customThreshold,
       isBenefitProtected: false,
-      reasonHindi: `अलर्ट: संयुक्त बिजली बिल बढ़कर ₹${nextMonthBill.toLocaleString("en-IN")} हो गया है। ${linkedFamiliesCount} परिवारों में बांटने पर भी प्रति परिवार ₹${effectiveShare.toLocaleString("en-IN")} आता है, जो ₹${customThreshold.toLocaleString("en-IN")} सीमा से अधिक है! सुरक्षा शील्ड स्वतः निरस्त हुई।`,
-      reasonEnglish: `ALERT: Joint electricity bill surged to ₹${nextMonthBill.toLocaleString("en-IN")}. Even split across ${linkedFamiliesCount} families, per-family share is ₹${effectiveShare.toLocaleString("en-IN")} (exceeds ₹${customThreshold.toLocaleString("en-IN")}). Shield auto-revoked.`,
+      reasonHindi: `अलर्ट: संयुक्त बिजली बिल बढ़कर ₹${nextMonthBill.toLocaleString("en-IN")} हो गया है। ${divisor} परिवारों में बांटने पर भी प्रति परिवार ₹${displayShare.toLocaleString("en-IN")} आता है, जो ₹${customThreshold.toLocaleString("en-IN")} सीमा के बराबर या अधिक है! सुरक्षा शील्ड स्वतः निरस्त हुई।`,
+      reasonEnglish: `ALERT: Joint electricity bill surged to ₹${nextMonthBill.toLocaleString("en-IN")}. Even split across ${divisor} families, per-family share reaches ₹${displayShare.toLocaleString("en-IN")} (>= ₹${customThreshold.toLocaleString("en-IN")}). Shield auto-revoked.`,
     };
   }
 }

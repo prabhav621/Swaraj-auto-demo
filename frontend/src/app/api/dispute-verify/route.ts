@@ -3,6 +3,7 @@ import {
   runMultiFamilyGraphCheck,
   runVahanFootprintCheck,
   runMemberSplitGraphCheck,
+  runAlternativeRebuttalCheck,
   evaluateDeltaWatcherPredicate,
 } from "@/lib/dispute-engine";
 
@@ -31,6 +32,16 @@ export async function POST(request: Request) {
     if (action === "member-split-check") {
       const { simulateFraud } = body;
       const result = runMemberSplitGraphCheck(Boolean(simulateFraud));
+      return NextResponse.json(result);
+    }
+
+    if (action === "alternative-rebuttal-check") {
+      const { operatorCode, rebuttalId, documentReference } = body;
+      const result = runAlternativeRebuttalCheck(
+        operatorCode || "T6",
+        rebuttalId || "OTHER_EXCEPTIONAL_GROUND",
+        documentReference || "FIR-2026-RJ-0891"
+      );
       return NextResponse.json(result);
     }
 
