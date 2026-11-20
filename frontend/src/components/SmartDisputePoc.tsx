@@ -292,7 +292,7 @@ export default function SmartDisputePoc() {
             </span>
           </div>
           <div>
-            <span className="text-slate-400 block">Tehsil &amp; LGD Ward:</span>
+            <span className="text-slate-400 block">Tehsil &amp; LGD Village / Ward:</span>
             <span className="font-bold text-slate-200">
               {currentCase.tehsil}, {currentCase.district} (LGD #{currentCase.lgdWardCode})
             </span>
@@ -397,7 +397,7 @@ export default function SmartDisputePoc() {
                   Onboard Any Rajasthan Welfare Scheme in 60 Seconds
                 </h3>
                 <p className="text-xs text-slate-300 mt-1 max-w-3xl">
-                  Select an official Rajasthan Government Order preset or edit the <code className="text-amber-300">$Placeholders</code> below. Changes immediately parameterize the Layer 1 Matrix Engine, Layer 3 e-Mitra Rebuttals (<code className="text-emerald-300">T1–T6</code>), and Layer 4 Delta-Watcher.
+                  Select an official Rajasthan Government Order preset or edit the <code className="text-amber-300">$Placeholders</code> below. Statutory <code className="text-emerald-300">K-Series</code> rules follow official Gazette Notifications, while <code className="text-amber-300">A-Series</code> risk proxies (<code className="text-amber-300">$MAX_DISCOM_BILL</code>, kW, triage weights) are configured jointly with Department / RISL Nodal Officers to parameterize Layer 1, Layer 3 (<code className="text-emerald-300">T1–T6</code>), and Layer 4 Delta-Watcher.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -483,6 +483,9 @@ export default function SmartDisputePoc() {
                     Live Binding
                   </span>
                 </div>
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  <b>Ministry Calibration Split:</b> Statutory <code>K-Series</code> hard rules follow official Gazette Notifications; <code>A-Series</code> risk proxies (<code>$MAX_DISCOM_BILL</code>, kW, triage weights) are configured jointly with Department / RISL Nodal Officers.
+                </p>
 
                 <div className="space-y-3">
                   <div>
@@ -600,7 +603,7 @@ export default function SmartDisputePoc() {
                     • <b>RFCTLARR Sec. 96:</b> Highway land award subtracted in L1
                   </span>
                   <span className="text-slate-300 block">
-                    • <b>MCA21 Sec. 378C(3):</b> FPO <code>PRODUCER_COMPANY</code> directors exempted in L1
+                    • <b>MCA21 Companies Act, 2013 Chapter XXIA (Sec. 378B–378F):</b> FPO <code>PRODUCER_COMPANY</code> directors exempted in L1
                   </span>
                 </div>
               </div>
@@ -609,10 +612,15 @@ export default function SmartDisputePoc() {
             {/* 12-Endpoint Connector Grid */}
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-2">
-                <h4 className="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
-                  <Database className="w-4 h-4 text-primary" />
-                  12-Endpoint Golden Record Integration Topology (7 State RajSewaDwaar + 5 Central API Setu / DFPD)
-                </h4>
+                <div>
+                  <h4 className="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                    <Database className="w-4 h-4 text-primary" />
+                    12-Endpoint Golden Record Integration Topology (7 State RajSewaDwar + 5 Central API Setu / DFPD)
+                  </h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Logical Service Namespaces (<code>RajSewaDwar</code> / <code>API Setu</code>) mapped to live departmental endpoints during RSDC onboarding.
+                  </p>
+                </div>
                 <button
                   onClick={() => setActiveTab("intake")}
                   className="px-3.5 py-1.5 bg-primary text-white rounded-lg text-xs font-bold flex items-center gap-1.5 self-start sm:self-auto"
@@ -627,16 +635,23 @@ export default function SmartDisputePoc() {
                     <div className="flex items-center justify-between gap-1 mb-1">
                       <span className="font-mono font-bold text-slate-900 truncate">{ep.id}</span>
                       <span
-                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0 ${
                           ep.tier === "STATE_RAJ_SEWA_DWAAR"
                             ? "bg-amber-100 text-amber-900"
                             : "bg-blue-100 text-blue-900"
                         }`}
                       >
-                        {ep.tier === "STATE_RAJ_SEWA_DWAAR" ? "RAJ SEWA DWAAR" : "CENTRAL FEED"}
+                        {ep.tier === "STATE_RAJ_SEWA_DWAAR" ? "RajSewaDwar" : "API Setu / DFPD"}
                       </span>
                     </div>
-                    <code className="text-[10px] text-emerald-700 block truncate mb-1">{ep.uri}</code>
+                    <p className="text-[10px] font-semibold text-slate-700 mb-0.5">{ep.department}</p>
+                    <div className="mb-1 space-y-0.5">
+                      {ep.uri.split(" | ").map((u) => (
+                        <code key={u} className="text-[10px] text-emerald-700 block break-all">
+                          {u}
+                        </code>
+                      ))}
+                    </div>
                     <p className="text-slate-500 leading-snug">{ep.purpose}</p>
                   </div>
                 ))}
@@ -773,14 +788,14 @@ export default function SmartDisputePoc() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-slate-900 text-base">
-                      Rajasthan e-Mitra Plus Operator Console
+                      Rajasthan e-Mitra Kiosk Operator Console
                     </h3>
                     <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded border border-amber-300">
                       Kiosk ID: EMITRA-JPR-0492
                     </span>
                   </div>
                   <p className="text-xs text-slate-600">
-                    Powered by Jan Aadhaar 2.0 Native Family Graph | Biometric Device: Mantra MFS100 (Connected)
+                    Powered by Jan Aadhaar 2.0 Native Family Graph | Biometric Device: Mantra MFS110 (UIDAI L1 RD Connected)
                   </p>
                 </div>
               </div>
@@ -877,7 +892,7 @@ export default function SmartDisputePoc() {
                 {currentCase.ruleCode === "RULE_DISCOM_24K" && (
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
                     <span className="font-bold text-slate-800 block">
-                      Jan Aadhaar 2.0 Split-Family Lineage Graph (Auto-Fetched via Parent ID JA-ROOT-1998-042110):
+                      Jan Aadhaar 2.0 Split-Family Lineage Graph (Auto-Fetched via Parent ID JA-ROOT-1998-080899):
                     </span>
                     <div className="space-y-1.5 font-mono">
                       <div className="p-2 bg-white rounded border flex justify-between items-center">
@@ -914,6 +929,10 @@ export default function SmartDisputePoc() {
                     </span>
                     <div className="p-2.5 bg-white rounded border space-y-1">
                       <div className="flex justify-between">
+                        <span className="text-slate-500">Jan Aadhaar HOF Basis:</span>
+                        <span className="font-semibold text-slate-700">Single-Adult Male HOF (Jan Aadhaar Act Sec. 1.1(k))</span>
+                      </div>
+                      <div className="flex justify-between">
                         <span className="text-slate-500">Form 29/30 &amp; Delivery Note:</span>
                         <span className="font-bold text-slate-800">Scanned &amp; Verified (14-May-2019)</span>
                       </div>
@@ -948,22 +967,25 @@ export default function SmartDisputePoc() {
                     </span>
                     <div className="p-2.5 bg-white rounded border space-y-1.5 font-mono text-[11px]">
                       <div className="flex justify-between">
-                        <span>1. Bhanwar Lal Jat (Code 01: HOF)</span>
+                        <span>1. Smt. Geeta Devi (Relation: SELF (Mukhiya / HOF), Age 58)</span>
+                        <span className="text-emerald-700 font-bold">Mukhiya / Homemaker (Keep Active)</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>2. Shri Bhanwar Lal Jat (Relation: HUSBAND)</span>
                         <span className="text-emerald-700 font-bold">Farmer (Keep Active)</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>2. Geeta Devi (Code 02: Wife)</span>
-                        <span className="text-emerald-700 font-bold">Homemaker (Keep Active)</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>3. Pooja Jat (Code 05: Daughter)</span>
+                        <span>3. Pooja Jat (Relation: DAUGHTER)</span>
                         <span className="text-emerald-700 font-bold">Student (Keep Active)</span>
                       </div>
                       <div className="flex justify-between bg-amber-50 p-1 rounded border border-amber-200">
-                        <span>4. Rahul Jat (Code 04: SON)</span>
+                        <span>4. Rahul Jat (Relation: SON)</span>
                         <span className="text-amber-900 font-bold">Railway HRMS &rarr; Split (T3)</span>
                       </div>
                     </div>
+                    <p className="text-[10px] text-slate-500">
+                      Semantic relation labels displayed above; backend Jan Aadhaar integer relation IDs are mapped via RSDC config.
+                    </p>
                     <div className="pt-2 border-t flex items-center justify-between">
                       <label className="text-slate-700 font-bold flex items-center gap-1.5 cursor-pointer">
                         <input
@@ -972,7 +994,7 @@ export default function SmartDisputePoc() {
                           onChange={(e) => setSimulateFraudRailway(e.target.checked)}
                           className="rounded text-red-600 focus:ring-red-500"
                         />
-                        Simulate HOF Himself Is Active Govt Employee Lifting Grain
+                        Simulate Mukhiya (HOF) Herself Is Active Govt Employee Lifting Grain
                       </label>
                     </div>
                   </div>
@@ -1206,7 +1228,7 @@ export default function SmartDisputePoc() {
                             <span className="text-amber-300">{memberSplitResult.relationCodeInJanAadhaar}</span>
                           </div>
                           <div>
-                            <span className="text-slate-500 block">Parents&apos; Revised NFSA Quota:</span>
+                            <span className="text-slate-500 block">Remaining Household NFSA Quota:</span>
                             <span className="text-emerald-400">
                               {memberSplitResult.remainingEligibleMembersCount} Members ({memberSplitResult.revisedMonthlyQuotaKg} kg/month)
                             </span>
@@ -1297,7 +1319,7 @@ export default function SmartDisputePoc() {
                         ? "Parent Jan Aadhaar Lineage Verified | 0 Collisions"
                         : currentCase.ruleCode === "RULE_VAHAN_4W"
                         ? "98.4% Dispossession Confidence | Vahan ELV Expired"
-                        : "Relation Code 04 (Son) | 0 kg e-POS Drawal by Son"}
+                        : "Relation: SON (Adult Child) | 0 kg e-POS Drawal by Son"}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -1309,7 +1331,7 @@ export default function SmartDisputePoc() {
                         ? `₹9,500 / family (< ₹${customDiscomThreshold.toLocaleString("en-IN")} PASS)`
                         : currentCase.ruleCode === "RULE_VAHAN_4W"
                         ? "Dispossessed in 2019 (Eligible)"
-                        : "Son Unit Severed; Parents Retain 15 kg/mo Quota"}
+                        : "Son Unit Severed; HOF & Family Retain 15 kg/mo Quota"}
                     </span>
                   </div>
                 </div>
@@ -1398,7 +1420,7 @@ export default function SmartDisputePoc() {
                     )}
                     {adjudicationDecision === "APPROVED" && currentCase.ruleCode === "RULE_GOVT_EMP_K01" && (
                       <>
-                        आवेदक <b>{currentCase.beneficiaryName}</b> (जन-आधार: {currentCase.janAadhaarId}) के प्रकरण में जन-आधार 2.0 रिलेशन कोड एवं DFPD e-POS बायोमेट्रिक रिकॉर्ड का सत्यापन किया गया। रेलवे HRMS में कार्यरत सदस्य <b>राहुल जाट (पुत्र - Code 04)</b> द्वारा नौकरी के पश्चात 0 किग्रा राशन उठाया गया है। अतः <code>T3 Member Split</code> के तहत केवल राहुल जाट की 5 किग्रा यूनिट को राशन कार्ड से पृथक करते हुए शेष 3 सदस्यों (15 किग्रा/माह) की खाद्य सुरक्षा पात्रता यथावत बहाल रखी जाती है।
+                        आवेदक मुखिया <b>{currentCase.beneficiaryName}</b> (जन-आधार: {currentCase.janAadhaarId}) के प्रकरण में जन-आधार 2.0 पारिवारिक संबंध एवं DFPD e-POS बायोमेट्रिक रिकॉर्ड का सत्यापन किया गया। रेलवे HRMS में कार्यरत सदस्य <b>राहुल जाट (Relation: SON / पुत्र)</b> द्वारा नौकरी के पश्चात 0 किग्रा राशन उठाया गया है। अतः <code>T3 Member Split</code> के तहत केवल राहुल जाट की 5 किग्रा यूनिट को राशन कार्ड से पृथक करते हुए शेष 3 सदस्यों (मुखिया गीता देवी, भंवर लाल जाट एवं पूजा जाट — 15 किग्रा/माह) की खाद्य सुरक्षा पात्रता यथावत बहाल रखी जाती है।
                       </>
                     )}
                     {adjudicationDecision === "FIELD_VISIT" && (
@@ -1417,7 +1439,7 @@ export default function SmartDisputePoc() {
                 <div className="flex items-center justify-between text-xs pt-2">
                   <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
                     <CheckCircle2 className="w-4 h-4" />
-                    Digitally Signed via Raj e-Sign (SSO Verified)
+                    Digitally Signed via Raj eSign (SSO Verified)
                   </div>
                   <button
                     onClick={() => setActiveTab("delta")}

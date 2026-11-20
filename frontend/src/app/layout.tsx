@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Swaraj-Auto Prototype',
-  description: 'Jaipur Rural Pilot Dashboard',
+  description: 'Swaraj-Auto: Post-SMART Welfare Dispute & Cross-Registry Proof Engine',
 }
 
 export default function RootLayout({

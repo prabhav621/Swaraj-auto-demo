@@ -19,51 +19,51 @@ export const DATA_ENDPOINTS_CATALOG: DataEndpointSpec[] = [
   {
     id: "JAN_AADHAAR_2_0",
     tier: "STATE_RAJ_SEWA_DWAAR",
-    uri: "rajsewadwaar://jan-aadhaar/v2/family-graph",
+    uri: "rajsewadwar://jan-aadhaar/v2/family-graph",
     department: "DoIT&C / Planning Dept, Rajasthan",
-    purpose: "Family ID, 19 relationship codes, split-family lineage, exemption category",
+    purpose: "Family ID, semantic relation graph (RSDC-mapped), split-family lineage, exemption category",
   },
   {
     id: "PEHCHAN_CRS",
     tier: "STATE_RAJ_SEWA_DWAAR",
-    uri: "rajsewadwaar://pehchan/v1/vital-events",
+    uri: "rajsewadwar://pehchan/v1/vital-events",
     department: "Economics & Statistics (Pehchan CRS)",
     purpose: "Birth, marriage & death registration sync (Flow vs. Stock inheritance)",
   },
   {
     id: "IFMS_3_0_PAYMANAGER",
     tier: "STATE_RAJ_SEWA_DWAAR",
-    uri: "rajsewadwaar://ifms/v3/employee-pensioner-verify",
+    uri: "rajsewadwar://ifms/v3/employee-pensioner-verify",
     department: "Finance Dept, Govt of Rajasthan (IFMS / RGHS / SIPF)",
     purpose: "State Govt & State PSU payroll/pension check (auto-exempts ASHA/Anganwadi honorarium)",
   },
   {
     id: "APNA_KHATA_EDHARTI_AGRISTACK",
     tier: "STATE_RAJ_SEWA_DWAAR",
-    uri: "rajsewadwaar://apna-khata/v2/jamabandi-khasra",
+    uri: "rajsewadwar://apna-khata/v2/jamabandi-khasra",
     department: "Revenue Dept & Rajasthan AgriStack (rjfr.agristack.gov.in)",
-    purpose: "Chahi/Barani/Gair-Mumkin area, Shamilati Khata co-sharers",
+    purpose: "Chahi/Nahri (canal)/Talabi (tank)/Barani/Gair-Mumkin area, Shamilati Khata co-sharers",
   },
   {
     id: "DISCOM_BIJLI_MITRA",
     tier: "STATE_RAJ_SEWA_DWAAR",
-    uri: "rajsewadwaar://discom-bijlimitra/v2/consumer-ledger",
+    uri: "rajsewadwar://discom-bijlimitra/v2/consumer-ledger",
     department: "JVVNL / AVVNL / JdVVNL Discoms",
-    purpose: "12-digit K-Number annual bill, LMV-1 load, LMV-5 agricultural pump",
+    purpose: "12-digit K-Number annual bill, RERC DS/LT-1 domestic load, AG/LT-4 agricultural pump (NDS/LT-2 micro-shops excluded from A03)",
   },
   {
     id: "ULB_SVAMITVA_PROPERTY",
     tier: "STATE_RAJ_SEWA_DWAAR",
-    uri: "rajsewadwaar://e-nagarpalika/v1/property-tax",
-    department: "LSG (e-NagarPalika) & Panchayati Raj (Svamitva)",
+    uri: "rajsewadwar://lsg-urban/v1/ud-property-tax",
+    department: "LSG Online (lsgonline.rajasthan.gov.in / UD Tax) & Panchayati Raj (SVAMITVA)",
     purpose: "3-tier LGD routing (Gram Panchayat/Palika/Nigam), sq.ft. & Kachhi Basti exemption",
   },
   {
     id: "RAJSSP_SJED_RAJFED",
     tier: "STATE_RAJ_SEWA_DWAAR",
-    uri: "rajsewadwaar://rajssp/v2/beneficiary-status",
-    department: "SJED & RajFED e-Procure",
-    purpose: "Duplicate scheme check (K06), school enrollment (K07), MSP crop quintals (A05)",
+    uri: "rajsewadwar://rajssp/v2/beneficiary-status | rajsewadwar://rajfed-msp/v1/crop-sales",
+    department: "SJED (ssp.rajasthan.gov.in) & RajFED / RajKisan MSP",
+    purpose: "Duplicate scheme check via ssp.rajasthan.gov.in (K06), school enrollment (K07), RajFED / RajKisan MSP crop quintals (A05)",
   },
   {
     id: "DFPD_NFSA_EPOS_RCMS",
@@ -98,7 +98,7 @@ export const DATA_ENDPOINTS_CATALOG: DataEndpointSpec[] = [
     tier: "CENTRAL_API_SETU_DFPD",
     uri: "apisetu://mca21/v3/din-director-check",
     department: "Ministry of Corporate Affairs (MCA21) & GSTN",
-    purpose: "DIN/GSTN status + Layer-1 auto-exemption for Companies Act Sec. 378C(3) FPO Producer Companies",
+    purpose: "DIN/GSTN status + Layer-1 auto-exemption for Companies Act, 2013 Chapter XXIA (Sec. 378B–378F) FPO Producer Companies",
   },
 ];
 
@@ -129,7 +129,7 @@ export interface SchemePlaybookPreset {
 export const SCHEME_PLAYBOOK_PRESETS: Record<string, SchemePlaybookPreset> = {
   SSP_PENSION: {
     schemeId: "SSP_PENSION",
-    schemeName: "Rajasthan Social Security Pension (Vridhjan / Ekal Nari / Divyang)",
+    schemeName: "Rajasthan Social Security Pension (Vridhjan / Ekal Nari / Vishesh Yogyajan / Laghu Evam Seemant Krishak)",
     department: "Social Justice & Empowerment Department (SJED)",
     goReference: "Rajasthan Social Security Pension Rules & SJED Verification Directive 2024-25",
     appellateAuthority: "Block Development Officer (BDO - Rural) / SDO (Urban)",
@@ -179,7 +179,7 @@ export const SCHEME_PLAYBOOK_PRESETS: Record<string, SchemePlaybookPreset> = {
   },
   PALANHAR_YOJANA: {
     schemeId: "PALANHAR_YOJANA",
-    schemeName: "Mukhyamantri Palanhar Yojana & Kali Bai Bheel Scooty Scheme",
+    schemeName: "Palanhar Yojana & Kalibai Bheel Medhavi Chhatra Scooty Yojana",
     department: "SJED & Commissionerate of College Education, Rajasthan",
     goReference: "SJED Palanhar Rules & Higher Education Scooty Guidelines",
     appellateAuthority: "District Officer (SJED) / Nodal Officer (College Education)",
@@ -247,15 +247,15 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
     statutoryCitation:
       "Rajasthan Social Security Pension Rules & SJED Verification Directive 2024-25 (read with S.Q. Masood v. State of Telangana, 2022)",
     appellateAuthorityTitle: "Block Development Officer (BDO), Panchayat Samiti Bassi",
-    lgdWardCode: "042110",
+    lgdWardCode: "080899",
     tehsil: "Bassi",
-    district: "Jaipur Rural",
+    district: "Jaipur",
     ruleCode: "RULE_DISCOM_24K",
     ruleDescription: "Annual Electricity Consumption Bill >= ₹24,000 across linked Jan Aadhaar household (A03 Proxy)",
     flaggedValue: "₹28,500 / year (Discom K-No: 21049201122)",
     thresholdValue: "₹24,000 / year",
     sourceDepartment: "Jaipur Vidyut Vitran Nigam Ltd (JVVNL - BijliMitra)",
-    sourceEndpointUri: "rajsewadwaar://discom-bijlimitra/v2/consumer-ledger",
+    sourceEndpointUri: "rajsewadwar://discom-bijlimitra/v2/consumer-ledger",
     statefulPredicateSummary: "KNO_21049201122: (Annual_Bill / 3_Linked_Families) < $MAX_DISCOM_BILL",
     cureWindowDaysLeft: 12,
     cureWindowExpiryDate: "15-Nov-2026",
@@ -300,16 +300,16 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
   "CASE_VAHAN_RAMLAL": {
     caseId: "RJ-NFSA-2026-4419",
     janAadhaarId: "5910284711",
-    beneficiaryName: "Shri Ram Lal Meena",
+    beneficiaryName: "Shri Ram Lal Meena (Single-Adult HOF)",
     age: 54,
     gender: "Male",
     schemeName: "National Food Security Act (NFSA Priority Household)",
     statutoryCitation:
       "Dept. of Food & Civil Supplies Notification dated 20.07.2017, Clause 5 (read with S.Q. Masood v. State of Telangana, 2022)",
     appellateAuthorityTitle: "District Supply Officer (DSO) / Sub-Divisional Officer (SDO), Phagi",
-    lgdWardCode: "042305",
+    lgdWardCode: "079919",
     tehsil: "Phagi",
-    district: "Jaipur Rural",
+    district: "Jaipur",
     ruleCode: "RULE_VAHAN_4W",
     ruleDescription: "Four-Wheeler Light Motor Vehicle (LMV) Registered under Household Member (K03)",
     flaggedValue: "Maruti Alto 800 (Reg: RJ-14-CC-4821, Reg Year: 2011)",
@@ -360,14 +360,14 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
   "CASE_RAILWAY_GOVT_SON": {
     caseId: "RJ-NFSA-2026-9104",
     janAadhaarId: "6738291044",
-    beneficiaryName: "Shri Bhanwar Lal Jat",
-    age: 61,
-    gender: "Male",
+    beneficiaryName: "Smt. Geeta Devi",
+    age: 58,
+    gender: "Female",
     schemeName: "National Food Security Act (NFSA Priority Household)",
     statutoryCitation:
       "Dept. of Food & Civil Supplies Notification dated 20.07.2017, Clause 5 & DFPD Rightful Targeting Directive (Nov 2026)",
     appellateAuthorityTitle: "District Supply Officer (DSO) / Sub-Divisional Officer (SDO), Dausa",
-    lgdWardCode: "041820",
+    lgdWardCode: "078501",
     tehsil: "Dausa",
     district: "Dausa",
     ruleCode: "RULE_GOVT_EMP_K01",
@@ -381,16 +381,16 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
     cureWindowExpiryDate: "17-Nov-2026",
     mobileNumberMasked: "+91-9784X-XXXX2",
     smsTranscriptHindi:
-      "प्रिय भंवर लाल जाट, आपके राशन कार्ड/जन-आधार के सदस्य राहुल जाट (पुत्र) का रेलवे HRMS वेतनमान में मिलान हुआ है। परिवार का राशन बंद होने से बचाने हेतु 15 दिन में ई-मित्र पर सदस्य पृथक्करण (Member Split) करें। केस: RJ-NFSA-2026-9104.",
+      "प्रिय गीता देवी (मुखिया), आपके जन-आधार/राशन कार्ड के सदस्य राहुल जाट (पुत्र) का रेलवे HRMS वेतनमान में मिलान हुआ है। परिवार का राशन बंद होने से बचाने हेतु 15 दिन में ई-मित्र पर सदस्य पृथक्करण (Member Split) करें। केस: RJ-NFSA-2026-9104.",
     ivrTranscriptHindi:
-      "नमस्ते भंवर लाल जी। भारत सरकार के खाद्य विभाग एवं रेलवे बोर्ड मिलान में आपके परिवार के सदस्य राहुल जाट सरकारी सेवा में पाए गए हैं। बुजुर्ग माता-पिता का राशन चालू रखने के लिए कृपया नजदीकी ई-मित्र पर जाकर केवल कार्यरत पुत्र का नाम राशन कार्ड से पृथक (Member Split) करवाएं।",
+      "नमस्ते गीता देवी जी। भारत सरकार के खाद्य विभाग एवं रेलवे बोर्ड मिलान में आपके परिवार के सदस्य राहुल जाट सरकारी सेवा में पाए गए हैं। परिवार एवं बुजुर्ग माता-पिता का राशन चालू रखने के लिए कृपया नजदीकी ई-मित्र पर जाकर केवल कार्यरत पुत्र का नाम राशन कार्ड से पृथक (Member Split) करवाएं।",
     allowedRebuttals: [
       {
         id: "EMPLOYED_SON_MEMBER_SPLIT",
         operatorCode: "T3",
         labelHindi: "[T3] कार्यरत पुत्र/विवाहित पुत्री अलग निवास करते हैं — केवल उस सदस्य की यूनिट हटाकर शेष परिवार की पात्रता जारी रखें",
-        labelEnglish: "T3 Member Split: Employed son/married daughter lives separately; delete only their 5 kg unit & keep parents' card active",
-        requiredEvidence: "Jan Aadhaar 2.0 Relation Check (Son/Daughter) + e-POS Non-Drawal Check + 1-Click Member Deletion",
+        labelEnglish: "T3 Member Split: Employed son/married daughter lives separately; delete only their 5 kg unit & keep HOF family's card active",
+        requiredEvidence: "Jan Aadhaar 2.0 Relation Check (Relation: SON / DAUGHTER) + e-POS Non-Drawal Check + 1-Click Member Deletion",
       },
       {
         id: "CONTRACTUAL_HONORARIUM_WORKER",
@@ -418,33 +418,33 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
   },
 };
 
-// Mock Master Database of Jan Aadhaar 2.0 Families residing in Bassi Ward 042110
+// Mock Master Database of Jan Aadhaar 2.0 Families residing in Bassi LGD Village 080899 (Tehsil 549)
 const JAN_AADHAAR_MOCK_REGISTRY: Record<
   string,
   { name: string; relation: string; parentJanAadhaarId: string; fatherHusband: string; ward: string; address: string }
 > = {
   "4829103847": {
     name: "Kamla Devi",
-    relation: "Self (Widow Mother - HOF)",
-    parentJanAadhaarId: "JA-ROOT-1998-042110",
+    relation: "Relation: SELF (Mukhiya / Widow Mother - HOF)",
+    parentJanAadhaarId: "JA-ROOT-1998-080899",
     fatherHusband: "Late Ramesh Meena",
-    ward: "042110",
+    ward: "080899",
     address: "Meena Mohalla, Near Old Baori, Bassi",
   },
   "4829103848": {
     name: "Suresh Meena",
     relation: "Son (Split Nuclear Card #2)",
-    parentJanAadhaarId: "JA-ROOT-1998-042110",
+    parentJanAadhaarId: "JA-ROOT-1998-080899",
     fatherHusband: "Late Ramesh Meena",
-    ward: "042110",
+    ward: "080899",
     address: "Meena Mohalla, Near Old Baori, Bassi",
   },
   "4829103849": {
     name: "Mahesh Meena",
     relation: "Son (Split Nuclear Card #3)",
-    parentJanAadhaarId: "JA-ROOT-1998-042110",
+    parentJanAadhaarId: "JA-ROOT-1998-080899",
     fatherHusband: "Late Ramesh Meena",
-    ward: "042110",
+    ward: "080899",
     address: "Meena Mohalla, Near Old Baori, Bassi",
   },
 };
@@ -558,7 +558,7 @@ export function runMultiFamilyGraphCheck(
     detailedProof: {
       addressMatches: lineageRatio === 1,
       fatherHusbandLineageMatch:
-        "Parent Family ID JA-ROOT-1998-042110 & Shared Father/Husband (Late Ramesh Meena) deterministically verified in LGD 042110",
+        "Parent Family ID JA-ROOT-1998-080899 & Shared Father/Husband (Late Ramesh Meena) deterministically verified in LGD 080899",
       antiGamingCollisionPass: true,
       verifiedMembers,
     },
@@ -646,15 +646,15 @@ export function runMemberSplitGraphCheck(simulateActiveFraud: boolean = false): 
     return {
       verified: false,
       statusCode: "HOF_ACTIVE_EMPLOYEE_FRAUD",
-      flaggedMemberName: "Bhanwar Lal Jat (Self - Head of Family)",
-      relationCodeInJanAadhaar: "Code 01: SELF / HEAD_OF_HOUSEHOLD",
-      employerVerified: "Indian Railways HRMS (Active Pay Level-4, Jaipur Division)",
+      flaggedMemberName: "Smt. Geeta Devi (Mukhiya / HOF)",
+      relationCodeInJanAadhaar: "Relation: SELF (Mukhiya / HOF)",
+      employerVerified: "State Govt / Indian Railways HRMS (Active Pay Level-4, Jaipur Division)",
       eposGrainDrawnByFlaggedMemberKg: 180,
       remainingEligibleMembersCount: 0,
       revisedMonthlyQuotaKg: 0,
       advisoryDecision: "RECOMMEND_CANCEL_CARD_RECOVERY",
       explanationHindi:
-        "गंभीर उल्लंघन: जन-आधार 2.0 ग्राफ के अनुसार सरकारी कर्मचारी स्वयं परिवार का मुखिया (HOF) है तथा e-POS बायोमेट्रिक लॉग के अनुसार विगत 12 माह में स्वयं के अंगूठे से 180 किग्रा मुफ्त राशन उठाया गया है। राशन कार्ड निरस्त कर वसूली योग्य।",
+        "गंभीर उल्लंघन: जन-आधार 2.0 ग्राफ के अनुसार सरकारी कर्मचारी स्वयं परिवार की मुखिया (HOF - Relation: SELF) है तथा e-POS बायोमेट्रिक लॉग के अनुसार विगत 12 माह में स्वयं के अंगूठे से 180 किग्रा मुफ्त राशन उठाया गया है। राशन कार्ड निरस्त कर वसूली योग्य।",
     };
   }
 
@@ -662,14 +662,14 @@ export function runMemberSplitGraphCheck(simulateActiveFraud: boolean = false): 
     verified: true,
     statusCode: "MEMBER_SPLIT_READY_PARENTS_PROTECTED",
     flaggedMemberName: "Rahul Jat (Member #4)",
-    relationCodeInJanAadhaar: "Code 04: SON (Adult Child Living Separately in Prayagraj)",
+    relationCodeInJanAadhaar: "Relation: SON (Adult Child Living Separately in Prayagraj)",
     employerVerified: "Indian Railways HRMS (Group-D Trackman, Joined Aug 2025)",
     eposGrainDrawnByFlaggedMemberKg: 0,
     remainingEligibleMembersCount: 3,
     revisedMonthlyQuotaKg: 15,
     advisoryDecision: "RECOMMEND_MEMBER_SPLIT_KEEP_CARD",
     explanationHindi:
-      "सत्यापित (T3 Member Split): जन-आधार 2.0 फैमिली ग्राफ के अनुसार कार्यरत सदस्य 'पुत्र (Code 04)' है। DFPD e-POS बायोमेट्रिक रिकॉर्ड के अनुसार नौकरी लगने के बाद राहुल जाट ने 0 किग्रा राशन उठाया है। केवल पुत्र की 5 किग्रा यूनिट हटाकर बुजुर्ग माता-पिता (3 सदस्य = 15 किग्रा/माह) का राशन कार्ड सुरक्षित रखा जाए।",
+      "सत्यापित (T3 Member Split): जन-आधार 2.0 फैमिली ग्राफ के अनुसार कार्यरत सदस्य 'पुत्र (Relation: SON)' है। DFPD e-POS बायोमेट्रिक रिकॉर्ड के अनुसार नौकरी लगने के बाद राहुल जाट ने 0 किग्रा राशन उठाया है। केवल पुत्र की 5 किग्रा यूनिट हटाकर मुखिया गीता देवी एवं शेष परिवार (3 सदस्य = 15 किग्रा/माह) का राशन कार्ड सुरक्षित रखा जाए।",
   };
 }
 
