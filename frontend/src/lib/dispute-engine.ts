@@ -5,6 +5,19 @@ export type CaseStatus =
   | "FIELD_VISIT_ORDERED"
   | "EXCLUSION_UPHELD";
 
+export type DueProcessStatus =
+  | "CLEAR"
+  | "AUTO_RESOLVED_PRE_NOTICE"
+  | "ANOMALY_VERIFY_REQUIRED"
+  | "SHOW_CAUSE_REQUIRED";
+
+export type SchemeId =
+  | "NFSA_RATION_CARD"
+  | "RJ_SSP_PENSION"
+  | "RJ_PALANHAR_YOJANA";
+
+export type RuleSeries = "K_SERIES" | "A_SERIES";
+
 export type RuleCode = "RULE_DISCOM_24K" | "RULE_VAHAN_4W" | "RULE_GOVT_EMP_K01";
 
 export interface DataEndpointSpec {
@@ -103,19 +116,25 @@ export const DATA_ENDPOINTS_CATALOG: DataEndpointSpec[] = [
 ];
 
 export interface SchemePlaybookPreset {
-  schemeId: string;
+  schemeId: SchemeId;
   schemeName: string;
   department: string;
   goReference: string;
   appellateAuthority: string;
   maxAnnualIncome: number;
+  maxServicePension: number;
   maxDiscomBill: number;
+  maxElectricityKw: number;
   maxIrrigatedHa: number;
   maxBarrenHa: number;
   ruralSqftCap: number;
   palikaSqftCap: number;
   nigamSqftCap: number;
+  maxMspQuintals: number;
   exemptCategories: string[];
+  statutoryRuleExemptions?: string[];
+  enabledKRules: string[];
+  enabledARules: string[];
   activeKRules: string[];
   activeARules: string[];
   boundRebuttalOperators: Array<{
@@ -126,21 +145,35 @@ export interface SchemePlaybookPreset {
   }>;
 }
 
-export const SCHEME_PLAYBOOK_PRESETS: Record<string, SchemePlaybookPreset> = {
-  SSP_PENSION: {
-    schemeId: "SSP_PENSION",
+export const SCHEME_PLAYBOOK_PRESETS: Record<SchemeId, SchemePlaybookPreset> = {
+  RJ_SSP_PENSION: {
+    schemeId: "RJ_SSP_PENSION",
     schemeName: "Rajasthan Social Security Pension (Vridhjan / Ekal Nari / Vishesh Yogyajan / Laghu Evam Seemant Krishak)",
     department: "Social Justice & Empowerment Department (SJED)",
     goReference: "Rajasthan Social Security Pension Rules & SJED Verification Directive 2024-25",
     appellateAuthority: "Block Development Officer (BDO - Rural) / SDO (Urban)",
     maxAnnualIncome: 48000,
+    maxServicePension: 48000,
     maxDiscomBill: 24000,
+    maxElectricityKw: 4.0,
     maxIrrigatedHa: 2.0,
     maxBarrenHa: 4.0,
     ruralSqftCap: 2000,
     palikaSqftCap: 1500,
     nigamSqftCap: 1000,
-    exemptCategories: ["Antyodaya", "BPL / State BPL", "Aastha Card", "Sahariya / Kathodi / Khairwa Tribe"],
+    maxMspQuintals: 100.0,
+    exemptCategories: [
+      "ANTYODAYA",
+      "BPL",
+      "STATE_BPL",
+      "AASTHA_CARD",
+      "SAHARIYA_KATHODI",
+      "SAHARIYA",
+      "KATHODI",
+      "KHAIRWA",
+    ],
+    enabledKRules: ["K01", "K02", "K06", "K07"],
+    enabledARules: ["A01", "A02", "A03", "A04"],
     activeKRules: ["K01_GOVT_EMP", "K02_INCOME_ITR", "K06_DUPLICATE", "K07_LIFECYCLE"],
     activeARules: ["A01_OCC_GAP (-25)", "A02_INCOME_GAP (-30)", "A03_DISCOM_BILL (-40)", "A04_UNSEEDED_KNO (-25)"],
     boundRebuttalOperators: [
@@ -152,22 +185,46 @@ export const SCHEME_PLAYBOOK_PRESETS: Record<string, SchemePlaybookPreset> = {
       { code: "T6", name: "Other / Exceptional Escalation", formula: "Route -> Appellate Review", description: "Tier-2 natural justice escalation with mandatory official document upload" },
     ],
   },
-  NFSA_RATION: {
-    schemeId: "NFSA_RATION",
-    schemeName: "National Food Security Act (NFSA Priority Household Ration Card)",
+  NFSA_RATION_CARD: {
+    schemeId: "NFSA_RATION_CARD",
+    schemeName: "National Food Security Act (NFSA Ration Card)",
     department: "Department of Food & Civil Supplies, Govt of Rajasthan",
-    goReference: "Food & Civil Supplies Dept Notification dated 20.07.2017, Clause 5 & Give-Up Drive 2024",
+    goReference: "Dept. of Food & Civil Supplies Notification dated 20.07.2017, Clause 5 & Oct 2024 Give-Up Drive",
     appellateAuthority: "District Supply Officer (DSO) / Sub-Divisional Officer (SDO)",
     maxAnnualIncome: 100000,
+    maxServicePension: 100000,
     maxDiscomBill: 50000,
+    maxElectricityKw: 4.0,
     maxIrrigatedHa: 2.0,
     maxBarrenHa: 4.0,
     ruralSqftCap: 2000,
     palikaSqftCap: 1500,
     nigamSqftCap: 1000,
-    exemptCategories: ["Antyodaya Anna Yojana (AAY)", "Notified Kachhi Basti (K05 Exempt)", "1 Tractor / Livelihood Commercial Vehicle (K03 Exempt)"],
-    activeKRules: ["K01_GOVT_EMP", "K02_INCOME_ITR", "K03_VEHICLE_4W", "K04_LAND_CAP", "K05_PUCCA_SQFT"],
-    activeARules: ["A01_OCC_GAP (-25)", "A02_INCOME_GAP (-30)", "A03_DISCOM_50K (-40)", "A05_MSP_100Q (-20)", "A06_PUMP_BARANI (-10)"],
+    maxMspQuintals: 100.0,
+    exemptCategories: ["ANTYODAYA"],
+    statutoryRuleExemptions: [
+      "Notified Kachhi Basti (K05 Exempt)",
+      "1 Tractor / Livelihood Commercial Vehicle (K03 Exempt)",
+    ],
+    enabledKRules: ["K01", "K02", "K03", "K04", "K05", "K06", "K07"],
+    enabledARules: ["A01", "A02", "A03", "A04", "A05", "A06"],
+    activeKRules: [
+      "K01_GOVT_EMP",
+      "K02_INCOME_ITR",
+      "K03_VEHICLE_4W",
+      "K04_LAND_CAP",
+      "K05_PUCCA_SQFT",
+      "K06_DUPLICATE",
+      "K07_LIFECYCLE",
+    ],
+    activeARules: [
+      "A01_OCC_GAP (-25)",
+      "A02_INCOME_GAP (-30)",
+      "A03_DISCOM_50K (-40)",
+      "A04_UNSEEDED_KNO (-25)",
+      "A05_MSP_100Q (-20)",
+      "A06_PUMP_BARANI (-10)",
+    ],
     boundRebuttalOperators: [
       { code: "T1", name: "Sever Wrong ID Link", formula: "Link(M, A) = 0", description: "Wrong RC/PAN/K-No seeded or Bogus GST/MCA Cyber FIR" },
       { code: "T2", name: "Temporal Cutoff (Sold / Non-Drawal)", formula: "t_end(A) < t_now", description: "Vehicle sold on Form 29/30, RVSF scrapped, or 0 kg e-POS drawal" },
@@ -177,20 +234,25 @@ export const SCHEME_PLAYBOOK_PRESETS: Record<string, SchemePlaybookPreset> = {
       { code: "T6", name: "Other / Exceptional Escalation", formula: "Route -> DSO/SDO Review", description: "Court-litigated/stay-order land or uncatalogued distress with official proof" },
     ],
   },
-  PALANHAR_YOJANA: {
-    schemeId: "PALANHAR_YOJANA",
-    schemeName: "Palanhar Yojana & Kalibai Bheel Medhavi Chhatra Scooty Yojana",
-    department: "SJED & Commissionerate of College Education, Rajasthan",
-    goReference: "SJED Palanhar Rules & Higher Education Scooty Guidelines",
-    appellateAuthority: "District Officer (SJED) / Nodal Officer (College Education)",
+  RJ_PALANHAR_YOJANA: {
+    schemeId: "RJ_PALANHAR_YOJANA",
+    schemeName: "Palanhar Yojana (SJED)",
+    department: "Social Justice & Empowerment Department (SJED)",
+    goReference: "SJED Palanhar Scheme Guidelines",
+    appellateAuthority: "District Officer (SJED) / SDO",
     maxAnnualIncome: 120000,
-    maxDiscomBill: 36000,
+    maxServicePension: 120000,
+    maxDiscomBill: 50000,
+    maxElectricityKw: 4.0,
     maxIrrigatedHa: 2.0,
     maxBarrenHa: 4.0,
     ruralSqftCap: 2000,
     palikaSqftCap: 1500,
     nigamSqftCap: 1000,
-    exemptCategories: ["Orphan Children", "Widow / Destitute Mother Category", "Silicosis / Leprosy Affected"],
+    maxMspQuintals: 100.0,
+    exemptCategories: ["ANTYODAYA", "ORPHAN_CATEGORY"],
+    enabledKRules: ["K01", "K02", "K06", "K07"],
+    enabledARules: ["A01", "A02"],
     activeKRules: ["K01_GOVT_EMP", "K02_INCOME_ITR", "K06_DUPLICATE_BENEFIT", "K07_ENROLLMENT_STATUS"],
     activeARules: ["A01_OCC_GAP (-25)", "A02_INCOME_GAP (-30)"],
     boundRebuttalOperators: [
@@ -202,8 +264,9 @@ export const SCHEME_PLAYBOOK_PRESETS: Record<string, SchemePlaybookPreset> = {
   },
 };
 
-export interface ExclusionNoticeCase {
+export interface DisputeCase {
   caseId: string;
+  schemeId: SchemeId;
   janAadhaarId: string;
   beneficiaryName: string;
   age: number;
@@ -215,6 +278,12 @@ export interface ExclusionNoticeCase {
   tehsil: string;
   district: string;
   ruleCode: RuleCode;
+  ruleId: "A03" | "K03" | "K01";
+  ruleSeries: RuleSeries;
+  dueProcessStatus: DueProcessStatus;
+  dueProcessBadgeLabel: string;
+  layer1AuditSummary: string;
+  layer1ResolvedIfLinkedSummary?: string;
   ruleDescription: string;
   flaggedValue: string;
   thresholdValue: string;
@@ -236,14 +305,17 @@ export interface ExclusionNoticeCase {
   }>;
 }
 
-export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
+export type ExclusionNoticeCase = DisputeCase;
+
+export const SEEDED_CASES: Record<string, DisputeCase> = {
   "CASE_DISCOM_KAMLA": {
     caseId: "RJ-SSP-2026-8821",
+    schemeId: "RJ_SSP_PENSION",
     janAadhaarId: "4829103847",
     beneficiaryName: "Smt. Kamla Devi",
     age: 68,
     gender: "Female",
-    schemeName: "Mukhyamantri Vridhjan Samman Pension (Social Security)",
+    schemeName: "Rajasthan Social Security Pension (Vridhjan Samman)",
     statutoryCitation:
       "Rajasthan Social Security Pension Rules & SJED Verification Directive 2024-25 (read with S.Q. Masood v. State of Telangana, 2022)",
     appellateAuthorityTitle: "Block Development Officer (BDO), Panchayat Samiti Bassi",
@@ -251,8 +323,16 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
     tehsil: "Bassi",
     district: "Jaipur",
     ruleCode: "RULE_DISCOM_24K",
-    ruleDescription: "Annual Electricity Consumption Bill >= ₹24,000 across linked Jan Aadhaar household (A03 Proxy)",
-    flaggedValue: "₹28,500 / year (Discom K-No: 21049201122)",
+    ruleId: "A03",
+    ruleSeries: "A_SERIES",
+    dueProcessStatus: "ANOMALY_VERIFY_REQUIRED",
+    dueProcessBadgeLabel: "ANOMALY_VERIFY_REQUIRED (Soft A03 Proxy — Manual Verification)",
+    layer1AuditSummary:
+      "At audit time, only Kamla Devi's primary Jan Aadhaar card (N = 1: 4829103847) was seeded on Discom K-Number 21049201122 (her sons' split Jan Aadhaar cards 4829103848 & 4829103849 were unlinked in Discom CBS). Layer 1 evaluated ₹28,500 / 1 >= ₹24,000 (A03 Soft Proxy, Score 60/100) and escalated it to Stage 2/3 for guided e-Mitra T4 linking—never a blind statutory K-Series cutoff.",
+    layer1ResolvedIfLinkedSummary:
+      "Once linked (N = 3), Layer 1 computes ₹28,500 / 3 = ₹9,500 < ₹24,000 and resolves it silently pre-notice as AUTO_RESOLVED_PRE_NOTICE.",
+    ruleDescription: "Annual Electricity Consumption Bill >= ₹24,000 across linked Jan Aadhaar household (A03 Soft Risk Proxy)",
+    flaggedValue: "₹28,500 / year (Discom K-No: 21049201122 · N=1 Unlinked at Audit)",
     thresholdValue: "₹24,000 / year",
     sourceDepartment: "Jaipur Vidyut Vitran Nigam Ltd (JVVNL - BijliMitra)",
     sourceEndpointUri: "rajsewadwar://discom-bijlimitra/v2/consumer-ledger",
@@ -299,11 +379,12 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
 
   "CASE_VAHAN_RAMLAL": {
     caseId: "RJ-NFSA-2026-4419",
+    schemeId: "NFSA_RATION_CARD",
     janAadhaarId: "5910284711",
     beneficiaryName: "Shri Ram Lal Meena (Single-Adult HOF)",
     age: 54,
     gender: "Male",
-    schemeName: "National Food Security Act (NFSA Priority Household)",
+    schemeName: "National Food Security Act (NFSA Ration Card)",
     statutoryCitation:
       "Dept. of Food & Civil Supplies Notification dated 20.07.2017, Clause 5 (read with S.Q. Masood v. State of Telangana, 2022)",
     appellateAuthorityTitle: "District Supply Officer (DSO) / Sub-Divisional Officer (SDO), Phagi",
@@ -311,7 +392,13 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
     tehsil: "Phagi",
     district: "Jaipur",
     ruleCode: "RULE_VAHAN_4W",
-    ruleDescription: "Four-Wheeler Light Motor Vehicle (LMV) Registered under Household Member (K03)",
+    ruleId: "K03",
+    ruleSeries: "K_SERIES",
+    dueProcessStatus: "SHOW_CAUSE_REQUIRED",
+    dueProcessBadgeLabel: "SHOW_CAUSE_REQUIRED (Hard K03 Statutory Rule)",
+    layer1AuditSummary:
+      "Cleared all Layer-1 Pre-Notice Shields (Pehchan vital check, Nil-Tax ITR, FPO, RFCTLARR Sec. 96). MoRTH Vahan 4.0 returned active registered 4-wheeler RC RJ-14-CC-4821 without a recorded Form 29/30 transfer or RVSF scrap certificate (K03 Statutory Rule, Score 0/100) → routed to Stage 2 15-Day Cure Window for T2 dispossession proof.",
+    ruleDescription: "Four-Wheeler Light Motor Vehicle (LMV) Registered under Household Member (K03 Statutory Rule)",
     flaggedValue: "Maruti Alto 800 (Reg: RJ-14-CC-4821, Reg Year: 2011)",
     thresholdValue: "0 Four-Wheeler (1 Tractor / 1 Livelihood Commercial Vehicle Exempt)",
     sourceDepartment: "Transport Department (MoRTH Vahan 4.0 Registry)",
@@ -359,11 +446,12 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
 
   "CASE_RAILWAY_GOVT_SON": {
     caseId: "RJ-NFSA-2026-9104",
+    schemeId: "NFSA_RATION_CARD",
     janAadhaarId: "6738291044",
     beneficiaryName: "Smt. Geeta Devi",
     age: 58,
     gender: "Female",
-    schemeName: "National Food Security Act (NFSA Priority Household)",
+    schemeName: "National Food Security Act (NFSA Ration Card)",
     statutoryCitation:
       "Dept. of Food & Civil Supplies Notification dated 20.07.2017, Clause 5 & DFPD Rightful Targeting Directive (Nov 2026)",
     appellateAuthorityTitle: "District Supply Officer (DSO) / Sub-Divisional Officer (SDO), Dausa",
@@ -371,6 +459,12 @@ export const SEEDED_CASES: Record<string, ExclusionNoticeCase> = {
     tehsil: "Dausa",
     district: "Dausa",
     ruleCode: "RULE_GOVT_EMP_K01",
+    ruleId: "K01",
+    ruleSeries: "K_SERIES",
+    dueProcessStatus: "SHOW_CAUSE_REQUIRED",
+    dueProcessBadgeLabel: "SHOW_CAUSE_REQUIRED (Hard K01 Statutory Rule)",
+    layer1AuditSummary:
+      "Ingested via DFPD / Central HRMS batch and re-verified through Layer 1: Pehchan CRS confirms flagged member Rahul Jat (Relation: SON) is living (is_deceased = false), and IFMS/HRMS confirms regular Group-D payroll (not honorarium). Layer 1 triggers K01 Statutory Notice (Score 0/100) → routed to Stage 2/3 for T3 Member Split to protect elderly parents' Ration Card.",
     ruleDescription: "Member-Level Aadhaar Matched Active Government / Railway Payroll (K01 - 1.82L Railway Drive)",
     flaggedValue: "Member #4: Rahul Jat (Son, Age 24) -> Indian Railways HRMS (Group-D Trackman, Prayagraj)",
     thresholdValue: "No Regular Central/State/PSU Employee in Household",
