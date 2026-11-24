@@ -323,76 +323,76 @@ export default function SmartDisputePoc() {
         </div>
       </div>
 
-      {/* 5-Stage Navigation Tabs */}
-      <div className="flex border-b border-slate-200 bg-white rounded-t-xl px-4 pt-3 gap-2 overflow-x-auto shadow-sm">
+      {/* 5-Stage Navigation Tabs (All 5 visible on desktop without hidden horizontal overflow) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 border-b border-slate-200 bg-white rounded-t-xl px-3 pt-2.5 gap-1.5 shadow-sm">
         <button
           onClick={() => setActiveTab("step0")}
-          className={`pb-3 px-4 font-bold text-sm transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+          className={`pb-2.5 pt-1.5 px-2.5 font-bold text-xs transition-all border-b-2 rounded-t-lg flex items-center justify-center gap-1.5 text-center ${
             activeTab === "step0"
-              ? "border-emerald-600 text-emerald-700"
-              : "border-transparent text-slate-500 hover:text-slate-900"
+              ? "border-emerald-600 text-emerald-700 bg-emerald-50/60"
+              : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
           }`}
         >
-          <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-xs font-black">
-            STAGE 0
+          <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-black shrink-0">
+            0
           </span>
-          Scheme Onboarding &amp; Playbook Builder
+          <span>Policy Compiler</span>
         </button>
 
         <button
           onClick={() => setActiveTab("intake")}
-          className={`pb-3 px-4 font-bold text-sm transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+          className={`pb-2.5 pt-1.5 px-2.5 font-bold text-xs transition-all border-b-2 rounded-t-lg flex items-center justify-center gap-1.5 text-center ${
             activeTab === "intake"
-              ? "border-primary text-primary"
-              : "border-transparent text-slate-500 hover:text-slate-900"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
           }`}
         >
-          <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-xs font-black">
+          <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-800 text-[10px] font-black shrink-0">
             1–2
           </span>
-          Stage 1–2: Layer-1 Scrutiny &amp; 15-Day Cure Notice
+          <span>Scrutiny &amp; Cure Notice</span>
         </button>
 
         <button
           onClick={() => setActiveTab("emitra")}
-          className={`pb-3 px-4 font-bold text-sm transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+          className={`pb-2.5 pt-1.5 px-2.5 font-bold text-xs transition-all border-b-2 rounded-t-lg flex items-center justify-center gap-1.5 text-center ${
             activeTab === "emitra"
-              ? "border-primary text-primary"
-              : "border-transparent text-slate-500 hover:text-slate-900"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
           }`}
         >
-          <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black">
+          <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center text-[10px] font-black shrink-0">
             3
           </span>
-          e-Mitra Kiosk (T1–T6 Proof Engine)
+          <span>e-Mitra Proof (T1–T6)</span>
         </button>
 
         <button
           onClick={() => setActiveTab("adjudication")}
-          className={`pb-3 px-4 font-bold text-sm transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+          className={`pb-2.5 pt-1.5 px-2.5 font-bold text-xs transition-all border-b-2 rounded-t-lg flex items-center justify-center gap-1.5 text-center ${
             activeTab === "adjudication"
-              ? "border-primary text-primary"
-              : "border-transparent text-slate-500 hover:text-slate-900"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
           }`}
         >
-          <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black">
+          <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center text-[10px] font-black shrink-0">
             4
           </span>
-          BDO / DSO / SDO Workbench
+          <span>Officer Workbench</span>
         </button>
 
         <button
           onClick={() => setActiveTab("delta")}
-          className={`pb-3 px-4 font-bold text-sm transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+          className={`col-span-2 sm:col-span-1 pb-2.5 pt-1.5 px-2.5 font-bold text-xs transition-all border-b-2 rounded-t-lg flex items-center justify-center gap-1.5 text-center ${
             activeTab === "delta"
-              ? "border-primary text-primary"
-              : "border-transparent text-slate-500 hover:text-slate-900"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
           }`}
         >
-          <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black">
+          <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center text-[10px] font-black shrink-0">
             5
           </span>
-          Live &quot;Delta-Watcher&quot; Ledger
+          <span>Delta-Watcher Ledger</span>
         </button>
       </div>
 
